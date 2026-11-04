@@ -219,7 +219,7 @@
     'om.tr.delay': 'São {m} minutos a mais que o normal.', 'om.tr.leave': 'Saia às {h}', 'om.ag.title': 'Agenda · {d}', 'om.ag.today': 'hoje',
     'om.ag.tomorrow': 'amanhã', 'om.ag.none': 'Nenhum compromisso.', 'om.ag.allday': 'dia todo', 'om.ag.at': 'às {h}',
     'om.ag.more': 'e mais {n}', 'om.ag.count.one': 'Você tem {n} compromisso {d}', 'om.ag.count.other': 'Você tem {n} compromissos {d}', 'om.sug.cam': 'Omega, me mostra a câmera {n}',
-    'om.sug.traffic': 'Omega, como está o trânsito até o trabalho de {n}?', 'om.sug.agenda': 'Omega, quais os compromissos de hoje?', 'om.sug.who': 'Omega, quem é você?', 'om.tv.title': 'Indisponível na TV',
+    'om.sug.traffic': 'Omega, como está o trânsito até o trabalho de {n}?', 'om.sug.agenda': 'Omega, quais os compromissos de hoje?', 'om.sug.who': 'Omega, quem é você?', 'om.sug.stock': 'Omega, tem algo vencido no estoque?', 'om.tv.title': 'Indisponível na TV',
     'om.tv.text': 'O modo Omega precisa de microfone, câmera e gráficos 3D, que os navegadores de TV (Tizen, webOS) não têm. Abra no computador ou no celular.', 'om.gl.title': 'Gráficos 3D indisponíveis', 'om.gl.text': 'Este navegador não tem WebGL ligado. Atualize o navegador ou ative a aceleração de hardware.',
     'cp.secretSet': 'configurada (em branco = manter)', 'cp.secretPaste': 'cole aqui', 'cp.secretClear': 'apagar a configurada',
     'cp.restartNote': 'Vale depois de reiniciar o hub.',

@@ -13,11 +13,21 @@ menu e a página mostra um aviso: falta microfone, WebGL confiável e desempenho
 | “Omega, me mostra a câmera da sala” | Painel com a câmera ao vivo (o mesmo vídeo da página Câmeras) |
 | “Omega, como está o trânsito até o trabalho da Cássia?” | Painel com minutos, nível, atraso, horário de saída e o trajeto; fala o resumo |
 | “Omega, quais os compromissos de hoje?” (ou “de amanhã”) | Painel com a agenda do dia e a lista falada (até 5 itens) |
+| “Omega, tem algo vencido no estoque?” | Fala o que já venceu e o que vence nos próximos 7 dias; painel com a lista (vencidos em vermelho) |
+| “Omega, o que tem na geladeira?” / “tem ovo no estoque?” | Lista o estoque (todo, de um local ou de um produto) com quantidade, local e validade |
+| “Omega, guarda 2 queijos na geladeira, vencem dia 10 de dezembro” | Grava o item no estoque (precisa de local e de quantidade e/ou peso; se faltar, ele pergunta) |
+| “Omega, tira o iogurte” / “usei 2 ovos” | Remove o item, ou só baixa a quantidade; se mais de um item combinar, pergunta qual |
+| “Omega, tem eletricista nos serviços?” / “preciso de um encanador” | Procura nos **Serviços** (profissionais) por tipo, nome ou assunto; painel com nome, tipo e contato |
+| “Omega, cadastra o João eletricista, telefone …” / “apaga o Marcos dos serviços” | Cadastra ou apaga um profissional (não repete nome + tipo já cadastrados) |
 | Qualquer outra pergunta | Resposta curta da IA (Groq ou Ollama, conforme a aba **IA** da Config) |
 
-Pedidos de câmera, trânsito e agenda são reconhecidos **por regra no hub** (rápido e sem gastar a IA). O resto vai para o modelo,
-que também pode escolher mostrar câmera, trânsito ou agenda (ferramentas). Os nomes vêm do que está cadastrado na Config
-(câmeras e pessoas do trânsito); acentos não importam (“cassia” = “Cássia”).
+Pedidos de câmera, trânsito, agenda e **consultas** ao estoque e aos serviços são reconhecidos **por regra no hub** (rápido e sem
+gastar a IA). O resto vai para o modelo, que também pode escolher mostrar câmera, trânsito ou agenda e, para estoque e serviços, usar as
+ferramentas `stock_list`, `stock_expired`, `stock_add`, `stock_remove`, `services_search`, `service_add` e `service_remove`: o hub executa a
+ferramenta (com a mesma validação das páginas Estoque e Serviços), devolve o resultado ao modelo e ele responde (até 4 idas e vindas por
+pedido). **Adicionar e remover só funcionam com a IA ligada**; sem ela o Omega responde que não conseguiu falar com a IA. Os nomes vêm do
+que está cadastrado na Config (câmeras, pessoas do trânsito, locais do estoque); acentos e plural não importam (“cassia” = “Cássia”,
+“ovo” = “Ovos”).
 
 ## Como usar
 
@@ -33,7 +43,8 @@ que também pode escolher mostrar câmera, trânsito ou agenda (ferramentas). Os
 ## Servidor
 
 `POST /api/omega/ask` (`server/omega.go`), corpo `{"text": "...", "history": [...]}` (até 6 mensagens anteriores), resposta
-`{"say", "actions": [{"type": "camera"|"traffic"|"agenda", ...}], "source": "rule"|"llm"|"none", "provider"}`. Exige a origem do próprio
+`{"say", "actions": [{"type": "camera"|"traffic"|"agenda"|"list", ...}], "source": "rule"|"llm"|"none", "provider"}`
+(`list` = painel pronto do estoque ou dos serviços: `{"title", "rows": [{"text", "sub", "warn"}], "more"}`). Exige a origem do próprio
 hub (a rota gasta cota da Groq), limite de 20 pedidos por minuto. Cliente de IA em `server/ai/llm.go` (formato OpenAI, Groq ou Ollama).
 
 ## Código
@@ -46,7 +57,8 @@ hub (a rota gasta cota da Groq), limite de 20 pedidos por minuto. Cliente de IA 
 | `src/js/omega/omega.js` | Conversa com o hub, executa as ações, webcam/presença, sugestões |
 | `src/vendor/three/` | three.js r128 (MIT) |
 | `server/omega.go`, `server/ai/llm.go` | Entendimento do pedido (regras + IA com ferramentas) |
+| `server/omega_data.go` | Estoque e serviços: regras de consulta, ferramentas do LLM e as alterações |
 
 ## Próximos passos (milestones)
 
-Voz local com Piper/whisper (M4), memória (M5) e mais ferramentas (M3: estoque, serviços, lembretes, notícias) entram no Omega.
+Voz local com Piper/whisper (M4), memória (M5) e mais ferramentas (M3: lembretes, notícias) entram no Omega.

@@ -218,7 +218,7 @@
     'om.tr.delay': '比平时多 {m} 分钟。', 'om.tr.leave': '请在 {h} 出发', 'om.ag.title': '日程 · {d}', 'om.ag.today': '今天',
     'om.ag.tomorrow': '明天', 'om.ag.none': '没有安排。', 'om.ag.allday': '全天', 'om.ag.at': '{h}',
     'om.ag.more': '还有 {n} 项', 'om.ag.count.other': '{d}您有 {n} 项安排', 'om.sug.cam': 'Omega，给我看摄像头 {n}', 'om.sug.traffic': 'Omega，{n} 去上班的路况如何？',
-    'om.sug.agenda': 'Omega，今天有什么安排？', 'om.sug.who': 'Omega，你是谁？', 'om.tv.title': '电视上不可用', 'om.tv.text': 'Omega 模式需要麦克风、摄像头和 3D 图形，电视浏览器（Tizen、webOS）不具备这些功能。请在电脑或手机上打开。',
+    'om.sug.agenda': 'Omega，今天有什么安排？', 'om.sug.who': 'Omega，你是谁？', 'om.sug.stock': 'Omega，库存里有过期的东西吗？', 'om.tv.title': '电视上不可用', 'om.tv.text': 'Omega 模式需要麦克风、摄像头和 3D 图形，电视浏览器（Tizen、webOS）不具备这些功能。请在电脑或手机上打开。',
     'om.gl.title': '3D 图形不可用', 'om.gl.text': '此浏览器未启用 WebGL。请更新浏览器或开启硬件加速。',
     'cp.secretSet': '已设置（留空 = 保持不变）', 'cp.secretPaste': '在此粘贴', 'cp.secretClear': '删除已设置的内容',
     'cp.restartNote': '重启 hub 后生效。',

@@ -218,7 +218,7 @@
     'om.tr.delay': 'That is {m} minutes more than usual.', 'om.tr.leave': 'Leave at {h}', 'om.ag.title': 'Agenda · {d}', 'om.ag.today': 'today',
     'om.ag.tomorrow': 'tomorrow', 'om.ag.none': 'No appointments.', 'om.ag.allday': 'all day', 'om.ag.at': 'at {h}',
     'om.ag.more': 'and {n} more', 'om.ag.count.one': 'You have {n} appointment {d}', 'om.ag.count.other': 'You have {n} appointments {d}', 'om.sug.cam': 'Omega, show me the {n} camera',
-    'om.sug.traffic': 'Omega, how is the traffic to {n}’s work?', 'om.sug.agenda': 'Omega, what are today’s appointments?', 'om.sug.who': 'Omega, who are you?', 'om.tv.title': 'Not available on TVs',
+    'om.sug.traffic': 'Omega, how is the traffic to {n}’s work?', 'om.sug.agenda': 'Omega, what are today’s appointments?', 'om.sug.who': 'Omega, who are you?', 'om.sug.stock': 'Omega, is anything expired in the stock?', 'om.tv.title': 'Not available on TVs',
     'om.tv.text': 'Omega mode needs a microphone, camera and 3D graphics, which TV browsers (Tizen, webOS) do not have. Open it on a computer or phone.', 'om.gl.title': '3D graphics unavailable', 'om.gl.text': 'This browser does not have WebGL enabled. Update the browser or turn on hardware acceleration.',
     'cp.secretSet': 'set (blank = keep)', 'cp.secretPaste': 'paste here', 'cp.secretClear': 'delete the saved one',
     'cp.restartNote': 'Takes effect after the hub restarts.',

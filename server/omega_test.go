@@ -17,7 +17,7 @@ func testOmega(t *testing.T, aiCfg ai.Config) (*omega, *http.ServeMux) {
 	t.Helper()
 	cams := newCameras([]CameraConfig{{ID: "sala", Name: "Sala de Estar", URL: "rtsp://x/y"}, {ID: "garagem", Name: "Garagem", URL: "rtsp://x/z"}})
 	tr := newTraffic(Config{Traffic: TrafficConfig{People: []Person{{ID: "cassia", Label: "Cássia"}}}})
-	o := newOmega(cams, tr, func() ai.Config { return aiCfg }, nil)
+	o := newOmega(cams, tr, nil, func() ai.Config { return aiCfg }, nil)
 	o.now = func() time.Time { return time.Date(2026, 11, 4, 14, 5, 0, 0, time.Local) }
 	mux := http.NewServeMux()
 	o.register(mux)
