@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -25,6 +26,7 @@ const (
 	omegaTemperature = 0.4  // respostas variadas, mas sem inventar
 	omegaMaxTokens   = 1024 // inclui o raciocínio dos modelos que pensam antes de responder (gpt-oss, qwen3)
 	omegaErrReason   = 120  // caracteres do motivo de erro mostrado ao usuário
+	omegaMaxName     = 40   // caracteres do nome pelo qual o Omega chama o usuário (Config > IA)
 	omegaDayToday    = "today"
 	omegaDayTomorrow = "tomorrow"
 	omegaSayFallback = "Perdão, Comandante, não tenho uma boa resposta para isso." // o modelo não disse nada nem chamou ferramenta
@@ -124,13 +126,14 @@ func (o *omega) ask(w http.ResponseWriter, r *http.Request) {
 	} {
 		if rep, ok := rule(); ok {
 			rep.Provider = cfg.Provider
+			rep.Say = omegaAddress(rep.Say, cfg.UserName)
 			writeJSON(w, rep)
 			return
 		}
 	}
 
 	rep := omegaReply{Source: "llm", Provider: cfg.Provider, Actions: []omegaAction{}}
-	msgs, tools := o.messages(text, req.History, cams, people), omegaTools(cams, people, o.dataTools())
+	msgs, tools := o.messages(text, req.History, cfg.UserName, cams, people), omegaTools(cams, people, o.dataTools())
 	var (
 		out      ai.ChatReply
 		dataSays []string // o que as ferramentas de estoque/serviços fizeram, caso o modelo fique mudo ou a IA caia no meio
@@ -167,6 +170,7 @@ func (o *omega) ask(w http.ResponseWriter, r *http.Request) {
 		if len(dataSays) > 0 { // já alterou algo: o usuário precisa saber
 			rep.Say = strings.Join(dataSays, " ")
 		}
+		rep.Say = omegaAddress(rep.Say, cfg.UserName)
 		writeJSON(w, rep)
 		return
 	}
@@ -183,7 +187,32 @@ func (o *omega) ask(w http.ResponseWriter, r *http.Request) {
 	if rep.Say == "" {
 		rep.Say = omegaSayFallback
 	}
+	rep.Say = omegaAddress(rep.Say, cfg.UserName)
 	writeJSON(w, rep)
+}
+
+// As frases prontas do Omega (regras, estoque, serviços) tratam o usuário por "Comandante"; omegaAddress troca isso pelo nome
+// configurado ou, com o nome em branco, tira o tratamento e deixa a frase natural ("Anotado, Comandante: X" -> "Anotado: X").
+const omegaTitle = "Comandante"
+
+var (
+	omegaTitleMid   = regexp.MustCompile(`,\s*` + omegaTitle + `\s*,`)              // "Pronto, Comandante, guardei" -> "Pronto, guardei"
+	omegaTitleEnd   = regexp.MustCompile(`,\s*` + omegaTitle + `\b`)                // "Anotado, Comandante: X" -> "Anotado: X"
+	omegaTitleStart = regexp.MustCompile(`(^|[.!?]\s+)` + omegaTitle + `,\s*(\pL)`) // "Comandante, veja" -> "Veja"
+	omegaTitleAlone = regexp.MustCompile(`\s*\b` + omegaTitle + `\b\s*`)            // qualquer outra sobra
+)
+
+func omegaAddress(say, name string) string {
+	if name != "" {
+		return strings.ReplaceAll(say, omegaTitle, name)
+	}
+	say = omegaTitleMid.ReplaceAllString(say, ",")
+	say = omegaTitleEnd.ReplaceAllString(say, "")
+	say = omegaTitleStart.ReplaceAllStringFunc(say, func(m string) string {
+		sub := omegaTitleStart.FindStringSubmatch(m)
+		return sub[1] + strings.ToUpper(sub[2])
+	})
+	return strings.TrimSpace(omegaTitleAlone.ReplaceAllString(say, " "))
 }
 
 // allow aplica o limite de taxa: no máximo omegaRateLimit pedidos em omegaRateWindow.
@@ -415,8 +444,8 @@ func omegaActionSay(a omegaAction) string {
 
 // ---- LLM ----
 
-func (o *omega) messages(text string, history []omegaMsg, cams, people []omegaItem) []ai.Message {
-	msgs := []ai.Message{{Role: "system", Content: omegaSystemPrompt(o.now(), cams, people) + o.dataPrompt()}}
+func (o *omega) messages(text string, history []omegaMsg, name string, cams, people []omegaItem) []ai.Message {
+	msgs := []ai.Message{{Role: "system", Content: omegaSystemPrompt(o.now(), name, cams, people) + o.dataPrompt()}}
 	var hist []ai.Message
 	for _, m := range history {
 		c := strings.TrimSpace(m.Content)
@@ -440,9 +469,14 @@ var (
 	omegaMonths   = []string{"janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"}
 )
 
-func omegaSystemPrompt(now time.Time, cams, people []omegaItem) string {
+func omegaSystemPrompt(now time.Time, name string, cams, people []omegaItem) string {
 	var b strings.Builder
-	b.WriteString("Você é Omega, o assistente da casa no estilo J.A.R.V.I.S.: formal, com um toque de humor seco. Chame o usuário de \"Comandante\". ")
+	b.WriteString("Você é Omega, o assistente da casa no estilo J.A.R.V.I.S.: formal, com um toque de humor seco. ")
+	if name != "" {
+		fmt.Fprintf(&b, "Chame o usuário de %q. ", name)
+	} else {
+		b.WriteString("Não use título nem apelido para o usuário (nada de \"Comandante\"). ")
+	}
 	b.WriteString("Responda em português do Brasil com no máximo 2 frases curtas, próprias para serem faladas em voz alta, sem markdown, listas nem emojis. ")
 	b.WriteString("Quando o pedido for mostrar uma câmera, o trânsito até o trabalho ou a agenda, use a ferramenta correspondente. ")
 	b.WriteString("Não invente câmeras, pessoas nem compromissos.\n")

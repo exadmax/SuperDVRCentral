@@ -3,8 +3,9 @@
 Página `omega.html`, atalho **Omega** no menu. Simula uma conversa com um assistente no estilo J.A.R.V.I.S.: você fala (ou digita)
 “Omega, …” e ele responde falando e mostrando o resultado em painéis 3D (three.js) ao redor de um núcleo de partículas que reage à voz.
 
-**Só para computador e celular.** Em navegadores de TV (Tizen, webOS e outros reconhecidos por `js/core/compat.js`) o atalho some do
-menu e a página mostra um aviso: falta microfone, WebGL confiável e desempenho para a cena 3D.
+**Na TV** (Tizen, webOS e outros reconhecidos por `js/core/compat.js`, ou `omega.html?tv=1` para testar no computador) o `omega.html`
+manda para `omega-tv.html`, que **não carrega o three.js nem a cena 3D**: só um GIF, uma caixa lateral e o microfone. Ver
+[Modo TV](#modo-tv) abaixo.
 
 ## O que ele entende hoje
 
@@ -40,6 +41,27 @@ que está cadastrado na Config (câmeras, pessoas do trânsito, locais do estoqu
 - **Texto**: digite na barra de baixo ou toque numa sugestão.
 - **Painéis**: até 3 ao mesmo tempo; arrastar gira a cena, clicar num painel traz para a frente, **Esc** ou ✕ limpa.
 
+## Modo TV
+
+Página `omega-tv.html` (`js/omega/tv.js`, `css/omega-tv.css`), pensada para a TV da sala e o controle remoto, sem teclado:
+
+- **GIF no centro**: `assets/img/omega.gif` (se não existir, usa `assets/img/omega.webp`). Brilha em verde ouvindo, azul falando e
+  pulsa pensando. Pixel art, então sai com `image-rendering: pixelated`; o fundo preto se funde com o da página.
+- **Caixa lateral estilo menu de Mega Drive** (moldura de pixels, seta piscando, abre e fecha deslizando em passos). Tem duas telas:
+  - **Menu**: “Falar com o Omega” e as perguntas mais comuns: câmera (primeira cadastrada), trânsito (até 2 pessoas da Config),
+    compromissos de hoje e de amanhã, algo vencido no estoque, o que tem na geladeira, quem é você. Os pedidos são os mesmos do
+    PC (`POST /api/omega/ask`).
+  - **Mensagem**: a resposta **uma página por vez**, com o texto surgindo letra a letra. Agenda e listas do hub (estoque, serviços)
+    viram uma página por item (vencidos em vermelho).
+- **Só microfone**, sem caixa de texto: aperta (botão redondo, “Falar com o Omega” ou a tecla vermelha), fala **um pedido sem dizer
+  “Omega”** e o microfone desliga sozinho (também desliga depois de 15 s sem fala). Usa a Web Speech API: precisa de um navegador que
+  reconheça fala. Onde não houver, aparece o aviso e dá para escolher as perguntas pela lista.
+- **Câmera**: troca o GIF por uma imagem da câmera atualizada a cada 2 s (a TV tem um só decodificador de vídeo). Se a câmera não
+  responder, o GIF fica e a página avisa “sem imagem”.
+- **Controle remoto**: ▲▼ escolhem, **OK** pergunta ou avança a página, ◀▶ trocam de página, **Voltar** vai da mensagem para o menu,
+  do menu para a caixa fechada e, com ela fechada, para a página inicial. Depois de 60 s sem mexer a caixa fecha e sobra só o GIF
+  (uma aba “Menu” fica na borda). Também funciona com mouse e toque.
+
 ## Servidor
 
 `POST /api/omega/ask` (`server/omega.go`), corpo `{"text": "...", "history": [...]}` (até 6 mensagens anteriores), resposta
@@ -53,7 +75,8 @@ hub (a rota gasta cota da Groq), limite de 20 pedidos por minuto. Cliente de IA 
 |---|---|
 | `src/omega.html`, `src/css/omega.css` | Página e HUD |
 | `src/js/omega/scene.js` | Cena three.js: núcleo, anéis, painéis holográficos, arrastar/clicar |
-| `src/js/omega/voice.js` | Reconhecimento com palavra de ativação, síntese de voz, nível do microfone |
+| `src/js/omega/voice.js` | Reconhecimento com palavra de ativação (ou sem ela, `noWake`, na TV), síntese de voz, nível do microfone |
+| `src/omega-tv.html`, `src/css/omega-tv.css`, `src/js/omega/tv.js` | Modo TV: GIF, caixa lateral estilo Mega Drive, microfone |
 | `src/js/omega/omega.js` | Conversa com o hub, executa as ações, webcam/presença, sugestões |
 | `src/vendor/three/` | three.js r128 (MIT) |
 | `server/omega.go`, `server/ai/llm.go` | Entendimento do pedido (regras + IA com ferramentas) |

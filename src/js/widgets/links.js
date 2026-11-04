@@ -16,9 +16,7 @@
 
   function render(s) {
     const b = base(s), booksOff = s.cfg.books && s.cfg.books.enabled === false;
-    const tv = CD.compat && CD.compat.detected();
-    const list = (s.cfg.links || []).filter(l => !(booksOff && /\/livros\.html$/.test(l.path)) &&     // página Livros desligada na Config
-      !(tv && /\/omega\.html$/.test(l.path)));                                                       // Omega não abre em TVs
+    const list = (s.cfg.links || []).filter(l => !(booksOff && /\/livros\.html$/.test(l.path)));     // página Livros desligada na Config
     if (!b || !list.length) return '';
     return '<nav class="links">' + list.map(l => {
       const h = href(l, b);

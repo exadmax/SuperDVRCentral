@@ -14,7 +14,14 @@
   const select = (f, v, opts) => '<select data-f="' + f + '">' + opts.map(o => '<option value="' + esc(o[0]) + '"' + (String(o[0]) === String(v) ? ' selected' : '') + '>' + esc(o[1]) + '</option>').join('') + '</select>';
 
   function mount(root) {
-    const st = { hw: null, status: null, cfg: null, hwErr: '', msg: null, testing: false, busy: false };
+    const st = { hw: null, status: null, cfg: null, hwErr: '', msg: null, testing: false, busy: false, voices: [] };
+
+    // vozes de síntese deste navegador (as do idioma da interface primeiro); a salva fica na lista mesmo que este aparelho não a tenha
+    function voiceOpts(cur) {
+      const l = st.voices.map(v => [v.name, v.name + ' (' + v.lang + ')']);
+      if (cur && !st.voices.some(v => v.name === cur)) l.unshift([cur, cur]);
+      return l;
+    }
 
     function cardHW() {
       let body;
@@ -58,6 +65,12 @@
       const m = st.msg;
       return '<div class="cfg-card" data-tab="ia" data-card="aicfg"><h2>' + t('ai.cfg.title') + '</h2>' +
         '<div class="cfg-grid">' +
+        '<div class="cfg-sub wide">' + t('ai.cfg.omega') + '</div>' +
+        fld(t('ai.cfg.userName'), input('userName', c.userName, { ph: t('ai.cfg.userNamePh') }), 'wide') +
+        fld(t('ai.cfg.voice'), select('voice', c.voice, [['', t('ai.cfg.voiceAuto')]].concat(voiceOpts(c.voice))) +
+          (CD.omegaVoice.canSpeak() ? ' ' + btn('voicetest', t('ai.cfg.voiceTest')) : ''), 'wide') +
+        '<div class="cfg-hint wide">' + t('ai.cfg.voiceHint') + '</div>' +
+        '<div class="cfg-sub wide">' + t('ai.cfg.provider') + '</div>' +
         fld(t('ai.cfg.provider'), select('provider', c.provider, [['ollama', t('ai.prov.ollama')], ['groq', t('ai.prov.groq')], ['off', t('ai.prov.off')]])) +
         fld(t('ai.cfg.ollamaURL'), input('ollamaURL', c.ollamaURL, { ph: 'http://127.0.0.1:11434' }), 'wide') +
         fld(t('ai.cfg.model'), input('model', c.model, { ph: t('ai.cfg.modelAuto'), list: 'ai-models' }), 'wide') +
@@ -109,12 +122,18 @@
       const act = b.getAttribute('data-a');
       if (act === 'aitest') test();
       else if (act === 'aisave') save();
+      else if (act === 'voicetest') {
+        const sel = root.querySelector('[data-card="aicfg"] [data-f="voice"]');
+        CD.omegaVoice.preview(sel ? sel.value : '', CD.i18n.locale(), t('ai.cfg.voiceSample'));
+      }
     });
 
     async function load() {
       if (!CD.state.hub) { draw(); return; }
       draw();
       try { st.cfg = await CD.hubApi.ai.settings(); } catch (e) { st.msg = { text: e.message, bad: true }; }
+      draw();
+      try { st.voices = await CD.omegaVoice.list(CD.i18n.locale()); } catch (e) { /* sem síntese de voz neste navegador */ }
       draw();
       try { st.hw = await CD.hubApi.ai.hardware(); } catch (e) { st.hwErr = e.message; }
       draw();

@@ -108,18 +108,56 @@ func omegaStems(s string) []string {
 	return words
 }
 
-// omegaWordsIn diz se todas as palavras de query aparecem em text (sem acento, maiúsculas nem plural). Query vazia casa com tudo.
-func omegaWordsIn(query, text string) bool {
-	have := map[string]bool{}
-	for _, w := range omegaStems(text) {
-		have[w] = true
+// omegaNear diz se duas palavras diferem em uma letra só (a mais, a menos ou trocada): tolera erro de digitação no cadastro ("encanaor").
+// Só vale para palavras de 6 letras ou mais; nas curtas uma letra já é outra palavra.
+func omegaNear(a, b string) bool {
+	if len(a) < 6 || len(b) < 6 || len(a)-len(b) > 1 || len(b)-len(a) > 1 {
+		return false
+	}
+	if len(a) < len(b) {
+		a, b = b, a
+	}
+	i := 0
+	for i < len(b) && a[i] == b[i] {
+		i++
+	}
+	if i == len(b) {
+		return true // b é a sem a última letra
+	}
+	if len(a) == len(b) {
+		return a[i+1:] == b[i+1:] // uma letra trocada
+	}
+	return a[i+1:] == b[i:] // uma letra a mais em a
+}
+
+// omegaWordCount conta quantas palavras de query aparecem em text (sem acento, maiúsculas nem plural; com tolerância a uma letra errada)
+// e devolve também o total de palavras de query.
+func omegaWordCount(query, text string) (hit, total int) {
+	have := omegaStems(text)
+	set := map[string]bool{}
+	for _, w := range have {
+		set[w] = true
 	}
 	for _, w := range omegaStems(query) {
-		if !have[w] {
-			return false
+		total++
+		if set[w] {
+			hit++
+			continue
+		}
+		for _, h := range have {
+			if omegaNear(w, h) {
+				hit++
+				break
+			}
 		}
 	}
-	return true
+	return hit, total
+}
+
+// omegaWordsIn diz se todas as palavras de query aparecem em text. Query vazia casa com tudo.
+func omegaWordsIn(query, text string) bool {
+	hit, total := omegaWordCount(query, text)
+	return hit == total
 }
 
 // ---- estoque ----
@@ -460,6 +498,22 @@ func (o *omega) serviceSearch(query string) omegaOutcome {
 		}
 	}
 	hit := append(first, rest...)
+	// Pedido com palavras que o cadastro não tem ("pesquisa", "instalado"): fica com quem casa o maior número das palavras.
+	if len(hit) == 0 {
+		best := 0
+		var part []Contato
+		for _, c := range all {
+			n, total := omegaWordCount(query, c.Nome+" "+c.TipoServico+" "+c.Servico+" "+c.Indicacao+" "+c.Obs)
+			if total < 2 || n == 0 || n < best {
+				continue
+			}
+			if n > best {
+				best, part = n, nil
+			}
+			part = append(part, c)
+		}
+		hit = part
+	}
 	data := make([]map[string]any, 0, len(hit))
 	for i, c := range hit {
 		if i == omegaMaxToolData {
@@ -627,7 +681,7 @@ func (o *omega) dataPrompt() string {
 	}
 	return "\nVocê também cuida do estoque da cozinha e dos serviços (profissionais cadastrados). " +
 		"Use stock_list e stock_expired para consultar o estoque, stock_add e stock_remove para alterá-lo, e services_search, service_add e service_remove para os serviços. " +
-		"Só adicione ou remova quando o Comandante pedir, e nunca diga que fez sem chamar a ferramenta. " +
+		"Só adicione ou remova quando o usuário pedir, e nunca diga que fez sem chamar a ferramenta. " +
 		"Se faltar um dado (local, quantidade ou peso, tipo de serviço), pergunte em vez de inventar; se mais de um item combinar com o que ele quer remover, pergunte qual. " +
 		"A validade vai no formato AAAA-MM-DD: converta datas ditas por extenso a partir da data de agora. " +
 		"Locais do estoque (id): " + strings.Join(omegaIDs(o.locais()), "; ") + "."
@@ -795,7 +849,12 @@ func (o *omega) serviceTypeRule(norm string) (omegaReply, bool) {
 	}
 	var q []string
 	for _, w := range words {
-		if types[omegaStem(w)] {
+		s := omegaStem(w)
+		ok := types[s]
+		for t := range types {
+			ok = ok || omegaNear(s, t)
+		}
+		if ok {
 			q = append(q, w)
 		}
 	}

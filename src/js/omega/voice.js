@@ -7,7 +7,8 @@
   const AWAIT_MS = 8000;      // depois de "Omega" sozinho, quanto tempo espera o pedido
 
   function create(opts) {
-    // opts: lang, onWake(), onInterim(text), onCommand(text), onState(listening:boolean), onSpeak(on:boolean), onError(msg)
+    // opts: lang, onWake(), onInterim(text), onCommand(text), onState(listening:boolean), onSpeak(on:boolean), onError(msg),
+    //       noWake (opcional): dispensa a palavra "Omega" (usado pela TV, onde o microfone é apertado para falar)
     let rec = null, enabled = false, speaking = false, awaitUntil = 0, restartTimer = 0;
     let audioCtx = null, analyser = null, micStream = null, buf = null;
 
@@ -40,6 +41,7 @@
     function handleFinal(txt) {
       txt = String(txt || '').trim();
       if (!txt) return;
+      if (opts.noWake) { opts.onCommand(txt); return; }   // TV: quem apertou o microfone já chamou; tudo o que ouvir é o pedido
       const m = WAKE.exec(txt);
       if (m) {
         const rest = txt.slice(m.index + m[0].length).trim();
@@ -84,23 +86,19 @@
       opts.onState(false);
     }
 
-    // escolhe uma voz do idioma (prefere as "naturais"/neurais do Edge e do Windows)
-    function pickVoice() {
-      const vs = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
-      const base = opts.lang.slice(0, 2).toLowerCase();
-      const same = vs.filter(v => (v.lang || '').toLowerCase().replace('_', '-').indexOf(base) === 0);
-      return same.find(v => /natural|neural|online/i.test(v.name) && v.lang.toLowerCase() === opts.lang.toLowerCase()) ||
-        same.find(v => v.lang.toLowerCase() === opts.lang.toLowerCase()) || same[0] || null;
-    }
+    // A voz vem da Config (nome exato); sem ela, a escolha automática é sempre a mesma para a mesma lista de vozes.
+    let voiceName = opts.voiceName || '';
+    function setVoice(name) { voiceName = String(name || ''); }
 
     function speak(text) {
-      return new Promise(resolve => {
-        if (!window.speechSynthesis || !text) return resolve();
+      if (!window.speechSynthesis || !text) return Promise.resolve();
+      // a lista de vozes carrega depois da página: sem esperar por ela a primeira fala saía com a voz padrão do sistema
+      return voicesReady().then(() => new Promise(resolve => {
         speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(text);
         u.lang = opts.lang; u.rate = 1.05; u.pitch = 0.9;
-        const v = pickVoice();
-        if (v) u.voice = v;
+        const v = findVoice(speechSynthesis.getVoices(), voiceName, opts.lang);
+        if (v) { u.voice = v; u.lang = v.lang || opts.lang; }
         const done = () => {
           if (!speaking) return;
           speaking = false; opts.onSpeak(false);
@@ -111,14 +109,59 @@
         speaking = true; opts.onSpeak(true);
         if (rec) try { rec.abort(); } catch (e) { /* para não ouvir a própria voz */ }
         speechSynthesis.speak(u);
-      });
+      }));
     }
 
     function hush() { if (window.speechSynthesis) speechSynthesis.cancel(); }
 
-    if (window.speechSynthesis) speechSynthesis.onvoiceschanged = () => { /* carrega a lista de vozes */ };
-    return { start: start, stop: stop, speak: speak, hush: hush, level: level, active: () => enabled, speaking: () => speaking };
+    return { start: start, stop: stop, speak: speak, hush: hush, level: level, setVoice: setVoice, active: () => enabled, speaking: () => speaking };
   }
 
-  CD.omegaVoice = { create: create, canListen: () => !!SR, canSpeak: () => !!window.speechSynthesis };
+  // ---------- vozes de síntese (compartilhado com a página Config) ----------
+  const sameLang = (v, lang) => (v.lang || '').toLowerCase().replace('_', '-').indexOf(lang.slice(0, 2).toLowerCase()) === 0;
+
+  // Resolve quando a lista de vozes do navegador está carregada (ou, no máximo, em VOICES_WAIT ms: há navegadores sem nenhuma voz).
+  const VOICES_WAIT = 1500;
+  function voicesReady() {
+    return new Promise(resolve => {
+      if (!window.speechSynthesis) return resolve([]);
+      if (speechSynthesis.getVoices().length) return resolve(speechSynthesis.getVoices());
+      const end = () => { speechSynthesis.removeEventListener('voiceschanged', end); clearTimeout(tm); resolve(speechSynthesis.getVoices()); };
+      const tm = setTimeout(end, VOICES_WAIT);
+      speechSynthesis.addEventListener('voiceschanged', end);
+    });
+  }
+
+  // Voz pelo nome configurado; se não existir neste aparelho, a escolha automática: do idioma, "natural/neural" primeiro, depois por nome
+  // (ordem fixa, para não mudar de voz a cada abertura da página).
+  function findVoice(vs, name, lang) {
+    if (name) { const exact = vs.find(v => v.name === name || v.voiceURI === name); if (exact) return exact; }
+    const full = lang.toLowerCase();
+    const rank = v => (/natural|neural|online/i.test(v.name) ? 0 : 2) + ((v.lang || '').toLowerCase().replace('_', '-') === full ? 0 : 1);
+    const same = vs.filter(v => sameLang(v, lang)).sort((a, b) => rank(a) - rank(b) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    return same[0] || null;
+  }
+
+  // Fala uma frase de teste com a voz dada (aba IA da Config).
+  function preview(name, lang, text) {
+    if (!window.speechSynthesis) return;
+    voicesReady().then(vs => {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      const v = findVoice(vs, name, lang);
+      u.lang = (v && v.lang) || lang; u.rate = 1.05; u.pitch = 0.9;
+      if (v) u.voice = v;
+      speechSynthesis.speak(u);
+    });
+  }
+
+  CD.omegaVoice = {
+    create: create, canListen: () => !!SR, canSpeak: () => !!window.speechSynthesis,
+    // vozes do aparelho, as do idioma da interface primeiro: [{name, lang, same}]
+    list: function (lang) {
+      return voicesReady().then(vs => vs.map(v => ({ name: v.name, lang: v.lang, same: sameLang(v, lang) }))
+        .sort((a, b) => (b.same - a.same) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0)));
+    },
+    preview: preview
+  };
 })(window.CD = window.CD || {});

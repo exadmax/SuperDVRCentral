@@ -20,6 +20,8 @@ type Config struct {
 	Model     string `json:"model,omitempty"`     // modelo do Ollama; vazio = o primeiro sugerido para a GPU
 	GroqKey   string `json:"groqKey,omitempty"`
 	GroqModel string `json:"groqModel,omitempty"`
+	UserName  string `json:"userName,omitempty"` // como o Omega chama o usuário; vazio = sem tratamento ("Olá, tudo bem?")
+	Voice     string `json:"voice,omitempty"`    // nome da voz de síntese do navegador usada pelo Omega; vazio = escolha automática
 }
 
 // WithDefaults devolve a configuração com os padrões preenchidos e o provedor normalizado.
@@ -36,5 +38,7 @@ func (c Config) WithDefaults() Config {
 	}
 	c.Model = strings.TrimSpace(c.Model)
 	c.GroqModel = strings.TrimSpace(c.GroqModel)
+	c.UserName = strings.Join(strings.Fields(c.UserName), " ")
+	c.Voice = strings.TrimSpace(c.Voice)
 	return c
 }
