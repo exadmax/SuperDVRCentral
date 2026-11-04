@@ -14,13 +14,13 @@
 
   function mount(root) {
     // Subseções: cada cartão tem data-tab e só os da aba escolhida aparecem (o CSS esconde os outros; nada é redesenhado ao trocar de aba)
-    const TABS = ['servidor', 'cameras', 'agendas', 'painel', 'livros', 'menu', 'integracoes', 'idioma', 'compat', 'ajuda'].map(id => [id, t('cfg.tab.' + id)]);
+    const TABS = ['servidor', 'cameras', 'agendas', 'painel', 'livros', 'menu', 'integracoes', 'ia', 'idioma', 'compat', 'ajuda'].map(id => [id, t('cfg.tab.' + id)]);
     let tab = 'servidor';
     try { tab = (location.hash || '').slice(1) || sessionStorage.getItem('cd:cfgtab') || tab; } catch (e) { /* sem armazenamento */ }
     if (!TABS.some(t => t[0] === tab)) tab = 'servidor';
     root.innerHTML = '<section class="pg cfg-root" data-show="' + tab + '"><nav class="cams-bar cfg-tabs">' + TABS.map(t =>
       '<button type="button" class="vbtn' + (t[0] === tab ? ' on' : '') + '" data-tab-go="' + t[0] + '">' + t[1] + '</button>').join('') + '</nav><div class="cfg-helplink" id="helplink"></div>' +
-      '<div class="cfg" id="cfg"></div><div id="cfgpanel" class="cfg-stack"></div><div id="cfgedit" class="cfg-stack"></div><div id="cfghelp" class="cfg-stack"></div></section>';
+      '<div class="cfg" id="cfg"></div><div id="cfgpanel" class="cfg-stack"></div><div id="cfgai" class="cfg-stack"></div><div id="cfgedit" class="cfg-stack"></div><div id="cfghelp" class="cfg-stack"></div></section>';
     const helpEl = root.querySelector('#cfghelp'), helpLink = root.querySelector('#helplink');
     // “Ajuda desta aba”: leva à seção da ajuda sobre o que está na tela
     const showHelpLink = () => { helpLink.innerHTML = tab === 'ajuda' ? '' : '<a href="#ajuda" data-help-go="' + tab + '">❓ ' + t('cfg.helpTab') + '</a>'; };
@@ -48,6 +48,7 @@
     if (CD.configEdit) CD.configEdit.mount(root.querySelector('#cfgedit'));   // câmeras, agendas, rotas, menu e modo compatibilidade (configEdit.js)
     if (CD.configHelp) CD.configHelp.mount(helpEl);                             // manual de cada configuração (configHelp.js)
     if (CD.configPanel) CD.configPanel.mount(root.querySelector('#cfgpanel')); // painel, estoque, feriados e opções do hub (configPanel.js)
+    if (CD.configAI) CD.configAI.mount(root.querySelector('#cfgai'));          // GPU, modelos sugeridos e provedor de IA (configAI.js)
     let sys = null, rec = null, drv = null, msg = '', recMsg = '', armed = '', armTimer = 0;
 
     function draw() {

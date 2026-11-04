@@ -315,3 +315,48 @@ func TestBancoIndisponivelResponde503(t *testing.T) {
 }
 
 func itoa(n int64) string { return strconv.FormatInt(n, 10) }
+
+// Banco que veio do DVRCentral: tem as tabelas do Diogows e user_version 11 (mais migrações do que este hub conhece).
+func TestBancoDoDVRCentralPerdeTabelasDoDiogows(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "antigo.db")
+	s, err := openStore(path, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.db.Exec(`INSERT INTO itens (nome, quantidade, local) VALUES ('Leite', 2, 'geladeira');
+		CREATE TABLE desk_users (id INTEGER PRIMARY KEY, nome TEXT);
+		CREATE TABLE desk_sessions (id INTEGER PRIMARY KEY);
+		CREATE TABLE desk_home (id INTEGER PRIMARY KEY);
+		PRAGMA user_version = 11;`); err != nil {
+		t.Fatal(err)
+	}
+	s.Close()
+
+	s, err = openStore(path, nil)
+	if err != nil {
+		t.Fatalf("banco do DVRCentral deveria abrir: %v", err)
+	}
+	defer s.Close()
+	var desk, itens, v int
+	s.db.QueryRow("SELECT count(*) FROM sqlite_master WHERE type = 'table' AND substr(name, 1, 5) = 'desk_'").Scan(&desk)
+	s.db.QueryRow("SELECT count(*) FROM itens").Scan(&itens)
+	s.db.QueryRow("PRAGMA user_version").Scan(&v)
+	if desk != 0 || itens != 1 || v != len(migrations) {
+		t.Fatalf("esperava 0 tabelas desk_*, 1 item e versão %d; veio %d, %d e %d", len(migrations), desk, itens, v)
+	}
+}
+
+// Banco de uma versão mais nova do hub (sem as tabelas do Diogows): não é migrado para trás.
+func TestBancoMaisNovoQueOHubEhRecusado(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "novo.db")
+	s, err := openStore(path, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s.db.Exec("PRAGMA user_version = 99")
+	s.Close()
+	if s, err := openStore(path, nil); err == nil {
+		s.Close()
+		t.Fatal("esperava erro para banco mais novo que o hub")
+	}
+}

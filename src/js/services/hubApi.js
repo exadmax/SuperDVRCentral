@@ -94,6 +94,13 @@
       drive() { return call('GET', '/api/recordings/drive'); },
       driveRun(ids) { return call('POST', '/api/recordings/drive/run', { cameras: ids || [] }, { 'X-CD-Action': 'confirm' }); }
     },
-    cameras: { list() { return call('GET', '/api/cameras'); }, streamUrl(id) { return CD.state.hub + '/api/cameras/' + encodeURIComponent(id) + '/stream'; } }
+    cameras: { list() { return call('GET', '/api/cameras'); }, streamUrl(id) { return CD.state.hub + '/api/cameras/' + encodeURIComponent(id) + '/stream'; } },
+    // IA (aba IA da Config): GPU do servidor, estado do Ollama/Groq e a configuração do provedor
+    ai: {
+      hardware() { return call('GET', '/api/ai/hardware'); },
+      status() { return call('GET', '/api/ai/status'); },
+      settings() { return call('GET', '/api/settings/ai'); },
+      save(obj) { return call('PUT', '/api/settings/ai', obj, { 'X-CD-Action': 'confirm' }); }
+    }
   };
 })(window.CD = window.CD || {});

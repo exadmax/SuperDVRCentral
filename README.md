@@ -1,11 +1,11 @@
 # SuperDVRCentral
 
-Versão do **DVRCentral / Central Diogo** para quem tem **GPU e um servidor mais potente**. Parte do mesmo painel da casa
+Versão do **DVRCentral / DVR** para quem tem **GPU e um servidor mais potente**. Parte do mesmo painel da casa
 (interface **TV**, a atual), sem a área de trabalho web (Diogows), e vai ganhar uma interface **PC** no estilo **J.A.R.V.I.S.**
 (assistente por voz com LLM local via Ollama) e **reconhecimento facial** nas câmeras — tudo o que for possível em **Go** e com base **SQLite**.
 Plano: **[docs/MILESTONES.md](docs/MILESTONES.md)** (tarefas em `tao.tasks.json`, time em `tao.json`, regras dos agentes em [AGENTS.md](AGENTS.md)); levantamento em [docs/superdvr/levantamento-e-milestones.md](docs/superdvr/levantamento-e-milestones.md).
 
-> O texto abaixo descreve a base herdada do DVRCentral (interface TV) e ainda usa os nomes originais (`centraldiogo-hub`, `/opt/centraldiogo`).
+> O texto abaixo descreve a base herdada do DVRCentral (interface TV) e ainda usa os nomes originais (`dvr-hub`, `/opt/dvr`).
 
 
 Painel de informações da casa: agenda, clima, trânsito, feriados, câmeras ao vivo, estoque da cozinha, lista de profissionais, vídeos e biblioteca de livros (PDF e EPUB).
@@ -54,7 +54,7 @@ O inventário completo, com fontes de dados, endpoints e arquivos de código, es
 TV / celular / PC ─►  navegador  ─►  http://192.168.0.10/  ─►  Hub Go (server/)
                                                                  ├─ serve o painel (src/)
                                                        ├─ /api/*  agenda, trânsito, estoque, serviços, câmeras, vídeos, livros, sistema
-                                                       ├─ SQLite  (centraldiogo.db)
+                                                       ├─ SQLite  (dvr.db)
                                                        └─ guarda as chaves e senhas (nunca vão para os aparelhos)
 ```
 
@@ -78,8 +78,8 @@ TV / celular / PC ─►  navegador  ─►  http://192.168.0.10/  ─►  Hub G
 
 ## Baixar e instalar
 Pacotes prontos nas **[Releases](https://github.com/exadmax/DVRCentral/releases/latest)** (a página de apresentação tem a [guia de download](https://exadmax.github.io/DVRCentral/#baixar)):
-- **Windows** (`centraldiogo-windows.zip`): extraia e abra o `Instalar.cmd`. Uma **janela** pergunta se este PC será o *servidor da casa* (tarefa do sistema, sobe com o Windows, atende a rede) ou de *uso pessoal* (só `localhost`, sem administrador). Dados em `%ProgramData%\CentralDiogo` (servidor) ou `%LocalAppData%\CentralDiogo` (pessoal), mantidos ao atualizar. Desinstale em Aplicativos do Windows.
-- **Linux** (`centraldiogo.tgz`): `tar xzf centraldiogo.tgz && sudo bash install.sh`.
+- **Windows** (`dvr-windows.zip`): extraia e abra o `Instalar.cmd`. Uma **janela** pergunta se este PC será o *servidor da casa* (tarefa do sistema, sobe com o Windows, atende a rede) ou de *uso pessoal* (só `localhost`, sem administrador). Dados em `%ProgramData%\DVR` (servidor) ou `%LocalAppData%\DVR` (pessoal), mantidos ao atualizar. Desinstale em Aplicativos do Windows.
+- **Linux** (`dvr.tgz`): `tar xzf dvr.tgz && sudo bash install.sh`.
 Limite no Windows: os botões da Config que param o desktop e o hub (`systemctl`) são só do Linux.
 
 ## Começando
@@ -100,7 +100,7 @@ go run .
 Abra http://localhost:8080 e vá em **Config**: câmeras, agendas, trânsito, menu, cidade e integrações se configuram pela própria tela
 (há uma aba **Ajuda** com o passo a passo). Sem `hub.config.json` o hub sobe com os padrões; se preferir configurar por arquivo,
 copie `hub.config.example.json` para `hub.config.json` e rode `go run . -config hub.config.json`.
-O painel fica em `../src` (rode a partir da pasta `server/`). O banco `centraldiogo.db` e o `hub.settings.json` (o que você edita na Config) são criados ao lado do `hub.config.json`.
+O painel fica em `../src` (rode a partir da pasta `server/`). O banco `dvr.db` e o `hub.settings.json` (o que você edita na Config) são criados ao lado do `hub.config.json`.
 
 Para o painel em outra porta falar com o hub (ex.: `python -m http.server 5173`), acrescente
 `"allowedOrigins": ["http://localhost:5173"]` ao `hub.config.json`, senão as gravações são recusadas.
@@ -123,7 +123,7 @@ Referência completa em `server/hub.config.example.json`.
 | `games` | Chaves de Steam, PSN, Xbox e RetroAchievements (subsistema sem tela) |
 | `dbPath`, `allowedOrigins`, `forceIPv4` | Banco SQLite, origens extras para gravar, uso de IPv4 nas consultas externas |
 
-Depois de editar: `sudo systemctl restart centraldiogo-hub`.
+Depois de editar: `sudo systemctl restart dvr-hub`.
 
 ### No painel: `src/config/settings.js` (opcional, ignorado pelo git)
 É mesclado sobre `settings.example.js`; coloque só o que mudar.
@@ -157,27 +157,27 @@ O painel e as páginas (inclusive a Config e o manual da aba Ajuda) existem em *
 No PC de desenvolvimento:
 ```bash
 cd server
-./package.sh        # gera dist/centraldiogo.tgz (4 binários Linux + painel + instalador)
+./package.sh        # gera dist/dvr.tgz (4 binários Linux + painel + instalador)
 ```
 No servidor Linux, após copiar e extrair o pacote:
 ```bash
-sudo bash install.sh           # instala em /opt/centraldiogo, libera a porta 80 e ativa o serviço
+sudo bash install.sh           # instala em /opt/dvr, libera a porta 80 e ativa o serviço
 bash install.sh --check        # só mostra a versão instalada e a próxima (sem sudo, sem alterar nada)
 ```
 O `install.sh` **não toca no banco, na pasta de livros**: reinstalar preserva estoque, serviços e livros. Ele também grava a regra do polkit que permite
-à página Config parar o desktop e o hub. Comandos úteis: `systemctl status centraldiogo-hub`, `journalctl -u centraldiogo-hub -f`.
+à página Config parar o desktop e o hub. Comandos úteis: `systemctl status dvr-hub`, `journalctl -u dvr-hub -f`.
 
 **Backup do banco** (modo WAL: não copie só o `.db` com o hub rodando):
 ```bash
-sudo systemctl stop centraldiogo-hub
-cp -a /opt/centraldiogo/centraldiogo.db* ~/backup-centraldiogo/
-sudo systemctl start centraldiogo-hub
+sudo systemctl stop dvr-hub
+cp -a /opt/dvr/dvr.db* ~/backup-dvr/
+sudo systemctl start dvr-hub
 ```
 
 ## Versão instalada
 - As versões publicadas seguem SemVer (`vMAIOR.MENOR.PATCH`) e saem como **Releases** do GitHub, com o pacote e os binários prontos. Política em **[docs/versionamento.md](docs/versionamento.md)**.
   Num pacote de release, o `install.sh` grava no servidor a versão da própria release; o contador abaixo vale só para pacotes montados do código.
-- O servidor guarda a versão no arquivo `VERSION` (`/opt/centraldiogo/VERSION`), formato `MAIOR.MENOR.PATCH`, por exemplo `1.0.1`.
+- O servidor guarda a versão no arquivo `VERSION` (`/opt/dvr/VERSION`), formato `MAIOR.MENOR.PATCH`, por exemplo `1.0.1`.
 - Cada `sudo bash install.sh` **concluído** soma 1 ao terceiro número e registra a linha em `install.log`. Instalação que falha no meio
   não muda a versão. Sem o arquivo, a primeira instalação vira `V1.0.1`. Para subir o primeiro ou o segundo número, edite o `VERSION` à mão.
 - Para conferir: `bash install.sh --check`, `curl localhost/api/version` (o `/api/health` também traz a versão) ou o rodapé do painel

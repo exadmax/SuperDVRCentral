@@ -1,6 +1,7 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "central-diogo", "runtimeExecutable": "python", "runtimeArgs": ["-m", "http.server", "5173", "--directory", "src"], "port": 5173 }
+    { "name": "dvr-hub", "runtimeExecutable": "go", "runtimeArgs": ["-C", "server", "run", ".", "-config", "hub.config.json"], "port": 8090 },
+    { "name": "painel-estatico", "runtimeExecutable": "python", "runtimeArgs": ["-m", "http.server", "5173", "--directory", "src"], "port": 5173 }
   ]
 }

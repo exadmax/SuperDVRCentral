@@ -10,7 +10,9 @@ var (
 	psapi    = syscall.NewLazyDLL("psapi.dll")
 )
 
-func ft(f syscall.Filetime) float64 { return float64(uint64(f.HighDateTime)<<32 | uint64(f.LowDateTime)) } // 100 ns
+func ft(f syscall.Filetime) float64 {
+	return float64(uint64(f.HighDateTime)<<32 | uint64(f.LowDateTime))
+} // 100 ns
 
 func readSys() (s sysSample, err error) {
 	var idle, kern, user syscall.Filetime

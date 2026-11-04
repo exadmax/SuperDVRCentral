@@ -18,6 +18,15 @@
       'the camera does not deliver H.264 at this address (use the substream: subtype=1)',
       'la cámara no entrega H.264 en esta dirección (use el substream: subtype=1)', '该地址的摄像头不提供 H.264（请使用子码流：subtype=1）'),
     L(/^falha ao gerar a imagem$/, 'snapfail', 'falha ao gerar a imagem', 'failed to generate the image', 'error al generar la imagen', '生成图像失败'),
+    // IA (aba IA da Config)
+    L(/^para usar a Groq, informe a chave$/, 'groqkey', 'para usar a Groq, informe a chave', 'to use Groq, enter the key', 'para usar Groq, introduzca la clave', '使用 Groq 需要填写密钥'),
+    L(/^provedor de IA inválido/, 'aiprov', 'provedor de IA inválido (use ollama, groq ou off)', 'invalid AI provider (use ollama, groq or off)',
+      'proveedor de IA no válido (use ollama, groq u off)', 'AI 提供方无效（请使用 ollama、groq 或 off）'),
+    L(/^endereço do Ollama inválido/, 'ollamaurl', 'endereço do Ollama inválido (ex.: http://127.0.0.1:11434)', 'invalid Ollama address (e.g. http://127.0.0.1:11434)',
+      'dirección de Ollama no válida (ej.: http://127.0.0.1:11434)', 'Ollama 地址无效（例如 http://127.0.0.1:11434）'),
+    L(/^Ollama não encontrado em (\S+): instale/, 'ollamadown', 'Ollama não encontrado em {1}: instale em https://ollama.com/download ou confira o endereço',
+      'Ollama not found at {1}: install it from https://ollama.com/download or check the address',
+      'Ollama no encontrado en {1}: instálelo desde https://ollama.com/download o compruebe la dirección', '在 {1} 找不到 Ollama：请从 https://ollama.com/download 安装或检查地址'),
     // banco de dados e requisições
     L(/^registro não encontrado$/, 'notfound', 'registro não encontrado', 'record not found', 'registro no encontrado', '未找到该记录'),
     L(/^banco de dados indisponível/, 'dbdown', 'banco de dados indisponível (veja o log do hub)', 'database unavailable (check the hub log)',

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Roda NO Linux, com sudo:  sudo bash install.sh
-# Instala o hub em /opt/centraldiogo, libera a porta 80 e ativa o serviço.
+# Instala o hub em /opt/dvr, libera a porta 80 e ativa o serviço.
 # Pacote de release (tem o arquivo RELEASE, gravado por package.sh a partir da tag vX.Y.Z): a instalação grava essa versão em VERSION.
 # Pacote sem RELEASE (montado do código, sem tag): cada instalação concluída soma 1 ao terceiro número (VERSION: 1.0.1 -> 1.0.2).
 # Só consultar a versão instalada, sem sudo e sem alterar nada:  bash install.sh --check
 set -e
 cd "$(dirname "$0")"
-D=/opt/centraldiogo
+D=/opt/dvr
 
 # Versão instalada = arquivo VERSION ("MAIOR.MENOR.PATCH"). Sem o arquivo ainda não há instalação versionada: parte de 1.0.0.
 # Para subir o MAIOR ou o MENOR, edite o VERSION à mão (ex.: 1.1.0); as instalações seguintes continuam somando no terceiro.
@@ -40,7 +40,7 @@ esac
 echo ">> arquitetura: $A"
 
 # a porta 80 precisa estar livre (o nginx atual está na 8080)
-if ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE '[:.]80$' && ! systemctl is-active --quiet centraldiogo-hub; then
+if ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE '[:.]80$' && ! systemctl is-active --quiet dvr-hub; then
   echo "!! Já existe algo escutando na porta 80:"; ss -ltnp | grep -E '[:.]80 ' || true; exit 1
 fi
 
@@ -56,7 +56,7 @@ else
 fi
 rm -rf "$D/www" && mkdir "$D/www" && tar -xzf www.tgz -C "$D/www"
 chown -R "$USER_RUN" "$D"
-sed "s/__USER__/$USER_RUN/" centraldiogo-hub.service > /etc/systemd/system/centraldiogo-hub.service
+sed "s/__USER__/$USER_RUN/" dvr-hub.service > /etc/systemd/system/dvr-hub.service
 
 # firewall: libera a 80 se houver ufw/firewalld ativo
 if command -v ufw >/dev/null && ufw status | grep -q "Status: active"; then ufw allow 80/tcp; echo ">> ufw: porta 80 liberada"
@@ -64,10 +64,10 @@ elif command -v firewall-cmd >/dev/null && systemctl is-active --quiet firewalld
 else echo ">> sem firewall ativo detectado (ufw/firewalld); nada a liberar"; fi
 
 systemctl daemon-reload
-systemctl enable centraldiogo-hub
-systemctl restart centraldiogo-hub
+systemctl enable dvr-hub
+systemctl restart dvr-hub
 sleep 1.5
-systemctl is-active centraldiogo-hub
+systemctl is-active dvr-hub
 
 # instalação concluída (o serviço subiu): registra a nova versão. O hub lê o arquivo, então /api/health já mostra a nova.
 echo "$NEW" > "$D/VERSION.tmp" && mv "$D/VERSION.tmp" "$D/VERSION"

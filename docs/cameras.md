@@ -75,12 +75,12 @@ Todo dia às **3:00** o hub (`server/drive.go`) envia as gravações novas para 
 - **Página Config → Google Drive**: **Sincronizar tudo** e, em cada câmera, **Sincronizar** enviam agora só as gravações novas (diferencial: o que já subiu não sobe de novo). Mostra o que falta por câmera, o andamento e o último resultado. Envio de só uma câmera não conta como a rodada das 3:00 e não apaga nada do Drive.
 - **Interruptor por câmera** ("Enviar ao Google Drive", ao lado do botão): desligado, a câmera fica fora da rodada das 3:00 e do **Sincronizar tudo**; só vai ao Drive se você clicar no **Sincronizar** da própria câmera. Ligado por padrão (campo `driveOff` em `recordings.state.json`). A limpeza por retenção no Drive vale para todas, ligadas ou não.
 - API (escrita exige `X-CD-Action: confirm`): `GET /api/recordings/drive` (estado, pendências por câmera, tentativas); `POST /api/recordings/drive/run` (envia agora; corpo opcional `{"cameras":["id"]}`); `POST /api/recordings/drive/skip` (`{"olderThanDays":2}` marca como já enviadas, sem enviar, as pendentes mais velhas que isso, para pular um acúmulo antigo; o arquivo fica no servidor até a retenção).
-- Ver o resultado: `journalctl -u centraldiogo-hub | grep drive:`.
+- Ver o resultado: `journalctl -u dvr-hub | grep drive:`.
 
 ### Configurar o rclone no servidor (uma vez)
 O remote `GDrive` precisa de um token da sua conta Google. O servidor não tem navegador, então o login é feito neste PC por um túnel SSH:
 ```bash
-ssh -i ~/.ssh/centraldiogo_deploy -L 53682:127.0.0.1:53682 usuario@192.168.0.10 'rclone config reconnect GDrive: --auto-confirm'
+ssh -i ~/.ssh/dvr_deploy -L 53682:127.0.0.1:53682 usuario@192.168.0.10 'rclone config reconnect GDrive: --auto-confirm'
 ```
 Abra no navegador do PC o link `http://127.0.0.1:53682/auth?state=...` que o comando imprime, entre com a conta Google e clique em Permitir.
 Conferir: `ssh usuario@192.168.0.10 'rclone lsd GDrive:'`. Opcional: criar um *client ID* próprio no Google Cloud (`rclone config`) para não

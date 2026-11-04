@@ -139,6 +139,9 @@ Todas as rotas respondem JSON (exceto vídeo/arquivos) com `Cache-Control: no-st
 | `GET /api/books/epub/{nome}/x/{arquivo}` | Arquivo de dentro do EPUB (HTML, CSS, imagens, fontes; sem scripts) | `books.go` |
 | `GET /api/system` | CPU/memória da máquina e do hub, `control`, `desktop` | `sysinfo.go` |
 | `POST /api/admin/desktop-off` | Para o display manager (exige `X-CD-Action: confirm`) | `power.go` |
+| `GET /api/ai/hardware` | GPUs (nome, fabricante, integrada, memória dedicada/compartilhada), memória efetiva para um modelo, modelos sugeridos e catálogo | `ai/hardware*.go`, `ai/catalog.go`, `ai/routes.go` |
+| `GET /api/ai/status` | Provedor ativo; Ollama alcançável, versão e modelos instalados (cabe/não cabe na GPU); Groq configurada (nunca devolve a chave) | `ai/status.go` |
+| `GET` / `PUT /api/settings/ai` | Aba IA da Config: provedor, endereço do Ollama, modelo, modelo e chave da Groq (`groqKeySet`; chave vazia = manter, `clearGroqKey` apaga) | `settings_ai.go` |
 | `POST /api/admin/hub-off` | Para o serviço do hub (exige `X-CD-Action: confirm`) | `power.go` |
 | `/` | Arquivos estáticos do painel (`staticDir`), com `Cache-Control: no-cache` | `main.go` |
 
@@ -183,7 +186,7 @@ Todas as rotas respondem JSON (exceto vídeo/arquivos) com `Cache-Control: no-st
 | `power.go` | Parar desktop/hub via `systemctl` (polkit) |
 | `games.go`, `games_psn.go`, `games_xbox.go`, `games_steam.go`, `games_retro.go` | Agregador de conquistas e um cliente por plataforma |
 | `version.go` | Lê o arquivo `VERSION` |
-| `install.sh`, `build.sh`, `package.sh`, `centraldiogo-hub.service` | Compilar (4 arquiteturas Linux), empacotar e instalar como serviço |
+| `install.sh`, `build.sh`, `package.sh`, `dvr-hub.service` | Compilar (4 arquiteturas Linux), empacotar e instalar como serviço |
 
 ### 5.2 Painel (`src/`)
 
@@ -209,11 +212,11 @@ Erros viram `Error` com a mensagem do servidor (traduzida por `CD.i18n.srv` quan
 
 | Arquivo | Onde | O que guarda |
 |---|---|---|
-| `hub.config.json` | servidor (`/opt/centraldiogo/`) | Porta, pasta do painel, agendas iCal, trânsito, câmeras (RTSP com senha), chaves de jogos, planilha, pastas de vídeos/gravações, `dbPath`, `allowedOrigins`. **Nunca versionar** (está no `.gitignore`) |
+| `hub.config.json` | servidor (`/opt/dvr/`) | Porta, pasta do painel, agendas iCal, trânsito, câmeras (RTSP com senha), chaves de jogos, planilha, pastas de vídeos/gravações, `dbPath`, `allowedOrigins`. **Nunca versionar** (está no `.gitignore`) |
 | `hub.config.example.json` | repositório | Modelo para copiar |
 | `settings.js` | `src/config/` | Local, cidade, atalhos, `cameras.rotateSeconds`, `estoque.soonDays`, `videos`, modo noturno |
 | `VERSION` | servidor | `MAIOR.MENOR.PATCH`; o `install.sh` soma 1 ao último número |
-| `centraldiogo.db` | servidor | SQLite (WAL) com `itens` e `contatos`; o `install.sh` não mexe |
+| `dvr.db` | servidor | SQLite (WAL) com `itens` e `contatos`; o `install.sh` não mexe |
 | `recordings.state.json` | servidor | Configuração das gravações por câmera |
 | `drive.state.json` | servidor | Gravações já copiadas para o Drive e resultado da última rodada |
 | `games.state.json` | servidor | Cache e tokens dos jogos (permissão 600) |

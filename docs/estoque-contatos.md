@@ -58,7 +58,7 @@ Os tipos viram filtros (Eletricista, Encanador...) e a busca procura em todos os
 
 ## Banco de dados
 
-- Arquivo `centraldiogo.db` ao lado do `hub.config.json` (em produção: `/opt/centraldiogo/centraldiogo.db`), criado e
+- Arquivo `dvr.db` ao lado do `hub.config.json` (em produção: `/opt/dvr/dvr.db`), criado e
   atualizado sozinho na primeira execução. O caminho muda em `dbPath` no `hub.config.json`.
 - O `install.sh` **não mexe** no banco: reinstalar o hub preserva os dados.
 - Driver em Go puro (`modernc.org/sqlite`, sem CGO), então `server/build.sh` continua gerando os 4 binários Linux.
@@ -66,9 +66,9 @@ Os tipos viram filtros (Eletricista, Encanador...) e a busca procura em todos os
 - Se o banco não abrir, o resto do hub (agenda, clima, jogos) segue no ar e as duas páginas mostram o erro.
 - **Backup** (o SQLite usa modo WAL, então não copie só o `.db` com o hub rodando):
   ```bash
-  sudo systemctl stop centraldiogo-hub
-  cp -a /opt/centraldiogo/centraldiogo.db* ~/backup-centraldiogo/
-  sudo systemctl start centraldiogo-hub
+  sudo systemctl stop dvr-hub
+  cp -a /opt/dvr/dvr.db* ~/backup-dvr/
+  sudo systemctl start dvr-hub
   ```
 
 ## API (no hub)

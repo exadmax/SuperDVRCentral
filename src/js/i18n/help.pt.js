@@ -40,7 +40,7 @@
       <p>Mostram o uso de CPU e memória do próprio hub e da máquina inteira, atualizados a cada 5 segundos. Se a memória da máquina estiver quase cheia, o painel pode ficar lento: use “Liberar memória”.</p>
       <h3>Liberar memória</h3>
       <ul><li><b>Desligar o desktop</b>: para o ambiente gráfico do servidor (tela, navegador, áudio do desktop). Não afeta o hub, o painel nem as câmeras. Volta sozinho no próximo reinício da máquina.</li>
-        <li><b>Desativar a central</b>: para o hub. O painel, as câmeras e a agenda saem do ar até alguém rodar no servidor <code>sudo systemctl start centraldiogo-hub</code>.</li></ul>
+        <li><b>Desativar a central</b>: para o hub. O painel, as câmeras e a agenda saem do ar até alguém rodar no servidor <code>sudo systemctl start dvr-hub</code>.</li></ul>
       <p>Os dois botões pedem <b>dois toques</b>: o primeiro arma o botão (“Confirmar?”, por 5 segundos) e o segundo executa. Só funcionam no servidor Linux, com a regra do polkit instalada pelo <code>install.sh</code>.</p>` },
 
     { id: 'cameras', title: 'Câmeras: cadastro', html: `
@@ -209,7 +209,7 @@
         <li>Os nomes de fábrica (Jogos, Geladeira, Câmeras…) são traduzidos para o idioma em uso; um nome que você digitou aparece exatamente como escrito.</li></ul>` },
 
     { id: 'integracoes', title: 'Integrações', html: `
-      <p>Opções do próprio hub. <b>Todas só valem depois de reiniciar o hub</b>: depois de salvar, aparece a faixa amarela com o botão <b>Reiniciar o hub agora</b> (o painel e as câmeras ficam fora do ar por alguns segundos). Se o botão não aparecer, reinicie no servidor: <code>sudo systemctl restart centraldiogo-hub</code>.</p>
+      <p>Opções do próprio hub. <b>Todas só valem depois de reiniciar o hub</b>: depois de salvar, aparece a faixa amarela com o botão <b>Reiniciar o hub agora</b> (o painel e as câmeras ficam fora do ar por alguns segundos). Se o botão não aparecer, reinicie no servidor: <code>sudo systemctl restart dvr-hub</code>.</p>
       <h3>Planilha de profissionais</h3>
       <p>A página Serviços (profissionais: eletricista, encanador…) pode ser alimentada por uma planilha do Google.</p>
       <ol><li>Na planilha, deixe uma aba com os cabeçalhos abaixo e <b>publique na web</b> (Arquivo &rarr; Compartilhar &rarr; Publicar na web) ou use o formato <code>https://docs.google.com/spreadsheets/d/ID/gviz/tq?tqx=out:csv&amp;sheet=NOME_DA_ABA</code>.</li>
@@ -230,6 +230,16 @@
         <li><b>Agendas: guardar por</b>: minutos que o hub reaproveita a agenda antes de ler o Google de novo (padrão 5).</li>
         <li><b>Trânsito: consultar no máximo a cada</b>: intervalo mínimo entre consultas à API (padrão 10). Aumente para gastar menos cota.</li>
         <li><b>Usar só IPv4</b>: necessário se a chave do Google tem restrição de IP.</li></ul>` },
+
+    { id: 'ia', title: 'IA (assistente)', html: `
+      <p>Configura a inteligência artificial usada pela interface PC (o assistente Jarvis). Tudo roda no servidor: nada da IA é instalado na TV ou no celular.</p>
+      <h3>GPU do servidor</h3>
+      <p>Mostra a placa de vídeo detectada e quanta memória sobra para um modelo. GPU integrada (Intel Iris Xe, por exemplo) não tem memória própria: usa a RAM do computador, por isso conta só metade da memória compartilhada. Os <b>modelos sugeridos</b> são os que cabem nessa memória; um modelo maior funciona, mas fica lento.</p>
+      <h3>Provedor</h3>
+      <ul><li><b>Ollama (local)</b>: o padrão. Instale o Ollama no servidor (<code>winget install Ollama.Ollama</code> no Windows, ou ollama.com/download) e baixe um modelo sugerido com <code>ollama pull &lt;modelo&gt;</code>. Nada sai da sua casa.</li>
+      <li><b>Groq (internet)</b>: mais rápido e com modelos maiores, mas o texto vai para a Groq. Exige a chave (console.groq.com/keys), que fica só no servidor.</li>
+      <li><b>Desligado</b>: a interface PC funciona sem o chat.</li></ul>
+      <p><b>Testar conexão</b> mostra a versão do Ollama e os modelos instalados, marcando os que cabem na GPU. Em GPU Intel ou AMD o Ollama usa Vulkan; se o modelo ficar lento, confira no servidor com <code>ollama ps</code> se ele foi para a GPU.</p>` },
 
     { id: 'idioma', title: 'Idioma', html: `
       <p>A interface (tela inicial, Geladeira e Dispensa, Serviços, Câmeras, Vídeos e a própria Config, inclusive esta Ajuda) existe em <b>quatro idiomas</b>: Português, English, Español e 中文 (chinês simplificado).</p>

@@ -286,7 +286,7 @@ func (e *apiErr) Error() string { return fmt.Sprintf("HTTP %d: %s", e.status, e.
 
 func (g *games) do(req *http.Request, out interface{}) error {
 	if req.Header.Get("User-Agent") == "" { // o RetroAchievements (Cloudflare) recusa o User-Agent padrão do Go
-		req.Header.Set("User-Agent", "CentralDiogo/1.0 (hub caseiro)")
+		req.Header.Set("User-Agent", "DVR/1.0 (hub caseiro)")
 	}
 	if req.Header.Get("Accept-Language") == "" {
 		req.Header.Set("Accept-Language", "pt-BR")

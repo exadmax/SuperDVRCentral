@@ -1,4 +1,4 @@
-// Hub da Central Diogo: serve o painel (pasta src/) e expõe /api/* para TV, celular e web.
+// Hub da DVR: serve o painel (pasta src/) e expõe /api/* para TV, celular e web.
 // Guarda as URLs secretas do calendário e a chave da TomTom fora dos aparelhos e resolve o CORS do Google.
 // Apenas biblioteca padrão: binário pequeno e pouca memória (feito para máquinas com 2 GB).
 package main
@@ -13,6 +13,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"dvr/hub/ai"
 )
 
 type Config struct {
@@ -32,6 +34,7 @@ type Config struct {
 	Recordings           RecordingsConfig `json:"recordings"`     // pasta das gravações das câmeras (liga/desliga e retenção: página Config)
 	DriveSync            DriveSyncConfig  `json:"driveSync"`      // cópia diária das gravações para o Google Drive via rclone (drive.go)
 	AllowedOrigins       []string         `json:"allowedOrigins"` // origens extras com permissão de gravar (ex.: painel em dev em outra porta)
+	AI                   ai.Config        `json:"ai"`             // provedor de IA (Ollama local ou Groq) e modelo; a chave da Groq nunca sai do hub
 }
 
 type CalendarConfig struct {
@@ -63,7 +66,7 @@ func homeDir() string {
 }
 
 func loadConfig(path string) Config {
-	c := Config{Listen: ":8080", StaticDir: "../src", CalendarCacheMinutes: 5, TrafficCacheMinutes: 10, ForceIPv4: true, DBPath: "centraldiogo.db", Videos: VideosConfig{Dir: filepath.Join(homeDir(), "Videos")}, Books: BooksConfig{Dir: filepath.Join(homeDir(), "Livros")}}
+	c := Config{Listen: ":8080", StaticDir: "../src", CalendarCacheMinutes: 5, TrafficCacheMinutes: 10, ForceIPv4: true, DBPath: "dvr.db", Videos: VideosConfig{Dir: filepath.Join(homeDir(), "Videos")}, Books: BooksConfig{Dir: filepath.Join(homeDir(), "Livros")}}
 	b, err := os.ReadFile(path)
 	if os.IsNotExist(err) {
 		// Primeira execução: sobe com os padrões e tudo (câmeras, agendas, trânsito...) se configura pela página Config.
@@ -152,6 +155,7 @@ func main() {
 	ds.start()
 	sm.cams, sm.rec, sm.cal, sm.tr = cams, rec, cal, tr
 	sm.register(mux)
+	ai.Register(mux, sm.aiConfig)
 	sys := newSysMon()
 	go sys.loop()
 	mux.HandleFunc("/api/videos", videosHandler(cfg.Videos))
@@ -170,7 +174,7 @@ func main() {
 	})
 	mux.HandleFunc("/api/system", sys.handler)
 	mux.HandleFunc("/api/admin/desktop-off", powerHandler(sys, dmUnit, false))
-	mux.HandleFunc("/api/admin/hub-off", powerHandler(sys, "centraldiogo-hub.service", true))
+	mux.HandleFunc("/api/admin/hub-off", powerHandler(sys, "dvr-hub.service", true))
 	mux.HandleFunc("/api/ics", func(w http.ResponseWriter, r *http.Request) { writeJSON(w, cal.get()) })
 	mux.HandleFunc("/api/traffic", func(w http.ResponseWriter, r *http.Request) {
 		q := r.URL.Query()
@@ -219,6 +223,6 @@ func main() {
 	if ver != "dev" {
 		ver = "V" + ver
 	}
-	log.Printf("Central Diogo hub %s em %s (painel: %s)", ver, cfg.Listen, cfg.StaticDir)
+	log.Printf("DVR hub %s em %s (painel: %s)", ver, cfg.Listen, cfg.StaticDir)
 	log.Fatal(srv.ListenAndServe())
 }

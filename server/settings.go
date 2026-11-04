@@ -17,6 +17,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"dvr/hub/ai"
 )
 
 // MenuLink é um atalho do rodapé do painel (mesmo formato de links em settings.example.js).
@@ -36,6 +38,7 @@ type hubSettings struct {
 	Menu      *[]MenuLink       `json:"menu,omitempty"`
 	Panel     *PanelSettings    `json:"panel,omitempty"` // tela inicial, feriados e locais do estoque (settings_panel.go)
 	Hub       *hubOptions       `json:"hub,omitempty"`   // opções do próprio hub (pastas, Drive, planilha, jogos...): valem após reiniciar
+	AI        *ai.Config        `json:"ai,omitempty"`    // aba IA (settings_ai.go)
 }
 
 func loadSettings(path string) hubSettings {
@@ -65,6 +68,9 @@ func (s hubSettings) applyTo(cfg *Config) {
 	}
 	if s.Hub != nil {
 		s.Hub.applyTo(cfg)
+	}
+	if s.AI != nil {
+		cfg.AI = *s.AI
 	}
 }
 
@@ -112,6 +118,13 @@ func (m *settingsMgr) register(mux *http.ServeMux) {
 	mux.HandleFunc("PUT /api/settings/traffic", m.write(m.putTraffic))
 	mux.HandleFunc("GET /api/settings/menu", func(w http.ResponseWriter, r *http.Request) { writeJSON(w, m.menuView()) })
 	mux.HandleFunc("PUT /api/settings/menu", m.write(m.putMenu))
+	mux.HandleFunc("GET /api/settings/ai", func(w http.ResponseWriter, r *http.Request) {
+		m.mu.Lock()
+		v := m.aiView()
+		m.mu.Unlock()
+		writeJSON(w, v)
+	})
+	mux.HandleFunc("PUT /api/settings/ai", m.write(m.putAI))
 	m.registerPanel(mux)
 }
 
