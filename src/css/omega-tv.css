@@ -1,0 +1,63 @@
+/* Omega na TV (omega-tv.html): GIF no centro e caixa lateral estilo menu de Mega Drive (moldura de pixels, seta piscando, texto surgindo
+   letra a letra). Medidas em vh/vw para valer de 720p a 4K. Cores do painel: azul #4DA3FF, verde #33E19A, âmbar #FFB020, vermelho #FF6B6B. */
+@font-face { font-family: 'Poppins'; src: url('../assets/fonts/poppins-700.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+
+:root { --bg: #02060D; --fg: #E8F1FB; --dim: #8FB7E0; --blue: #4DA3FF; --green: #33E19A; --amber: #FFB020; --red: #FF6B6B; --frame: #1D5DB5; --boxw: min(40vw, 780px); }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: radial-gradient(ellipse at 50% 45%, #0A1A2E 0%, var(--bg) 70%); color: var(--fg); font: 2.4vh/1.4 Inter, system-ui, sans-serif; overflow: hidden; }
+.tv { position: fixed; inset: 0; }
+
+.tv-brand { position: absolute; top: 3.5vh; left: 4vh; display: flex; flex-direction: column; z-index: 2; }
+.tv-brand b { font: 700 4vh/1 Poppins, Inter, sans-serif; letter-spacing: .35em; color: var(--blue); text-shadow: 0 0 2vh rgba(77, 163, 255, .6); }
+.tv-brand span { font-size: 1.7vh; color: var(--dim); letter-spacing: .12em; text-transform: uppercase; margin-top: .6vh; }
+
+/* palco: o GIF (ou a imagem da câmera), o que foi ouvido e o botão do microfone; encolhe quando a caixa abre */
+.tv-stage { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.6vh; transition: right .35s steps(7); }
+.tv.open .tv-stage { right: var(--boxw); }
+.tv-gif { height: 62vh; max-width: 100%; aspect-ratio: 1; object-fit: contain; image-rendering: pixelated; mix-blend-mode: screen; transition: filter .3s; }   /* screen: o fundo preto do GIF some no fundo da página */
+.tv-cam { max-height: 62vh; max-width: 92%; border: .6vh solid var(--blue); background: #06121f; box-shadow: 0 0 4vh rgba(77, 163, 255, .35); }
+.tv-stage[data-mode="listening"] .tv-gif { filter: drop-shadow(0 0 3vh rgba(51, 225, 154, .75)); }
+.tv-stage[data-mode="speaking"] .tv-gif { filter: drop-shadow(0 0 3vh rgba(77, 163, 255, .85)); }
+.tv-stage[data-mode="error"] .tv-gif { filter: drop-shadow(0 0 3vh rgba(255, 107, 107, .75)); }
+.tv-stage[data-mode="thinking"] .tv-gif { animation: tv-pulse 1s steps(4) infinite; }
+@keyframes tv-pulse { 50% { filter: drop-shadow(0 0 3vh rgba(77, 163, 255, .9)) brightness(1.25); } }
+
+.tv-heard { min-height: 3.4vh; max-width: 80%; text-align: center; color: var(--dim); font-size: 2.4vh; font-style: italic; }
+.tv-heard.interim { opacity: .7; }
+.tv-mic { width: 9vh; height: 9vh; padding: 2.2vh; border-radius: 50%; border: .4vh solid var(--blue); background: rgba(77, 163, 255, .12); color: var(--fg); cursor: pointer; }
+.tv-mic.on { background: rgba(51, 225, 154, .25); border-color: var(--green); box-shadow: 0 0 3vh rgba(51, 225, 154, .55); animation: tv-pulse 1s steps(4) infinite; }
+
+/* aba que sobra na borda quando a caixa está fechada */
+.tv-tab { position: absolute; right: 0; top: 50%; transform: translateY(-50%); padding: 1.6vh 2vh; background: var(--frame); color: #fff; font: 700 2.4vh/1 monospace; letter-spacing: .08em;
+  text-transform: uppercase; cursor: pointer; box-shadow: 0 0 0 .4vh #02060D, 0 0 0 .8vh var(--blue); }
+.tv.open .tv-tab { display: none; }
+
+/* caixa lateral (menu do Mega Drive) */
+.tv-box { position: absolute; top: 7vh; bottom: 7vh; right: 3vh; width: calc(var(--boxw) - 5vh); display: flex; flex-direction: column; padding: 2.6vh 2.8vh;
+  background: linear-gradient(#0C2B58, #06173A 60%, #04102A); font-family: 'Courier New', 'Lucida Console', monospace; font-weight: 700; letter-spacing: .05em;
+  box-shadow: 0 0 0 .5vh var(--blue), 0 0 0 1vh #02060D, 0 0 0 1.5vh var(--frame), 0 0 6vh rgba(77, 163, 255, .4);
+  transform: translateX(calc(100% + 8vh)); transition: transform .35s steps(7); }
+.tv.open .tv-box { transform: none; }
+.tv-h { display: flex; justify-content: space-between; font-size: 3vh; text-transform: uppercase; color: #9FD0FF; border-bottom: .5vh solid var(--frame); padding-bottom: 1.4vh; margin-bottom: 1.4vh;
+  text-shadow: .3vh .3vh 0 #000; }
+.tv-list { flex: 1; overflow: hidden; display: flex; flex-direction: column; gap: .4vh; }
+.tv-it { position: relative; flex: none; padding: 1.2vh 1.5vh 1.2vh 5vh; font-size: 2.7vh; line-height: 1.25; color: #CFE3FA; cursor: pointer; text-shadow: .25vh .25vh 0 #000; }
+.tv-it.mic { color: var(--green); text-transform: uppercase; }
+.tv-it.sel { color: #fff; background: var(--frame); }
+.tv-it.sel::before { content: ''; position: absolute; left: 1.4vh; top: 50%; margin-top: -1.3vh; border-style: solid; border-width: 1.3vh 0 1.3vh 2.1vh; border-color: transparent transparent transparent var(--amber);
+  animation: tv-blink .7s steps(2) infinite; }
+@keyframes tv-blink { 50% { opacity: 0; } }
+
+.tv-msg { flex: 1; display: flex; align-items: center; font-size: 3.7vh; line-height: 1.35; color: #fff; text-shadow: .25vh .25vh 0 #000; overflow: hidden; }
+.tv-msg.warn { color: #FF9B9B; }
+.tv-msg.typing::after { content: ''; display: inline-block; width: 1.4vh; height: 3vh; margin-left: .6vh; background: var(--amber); animation: tv-blink .5s steps(2) infinite; }
+.tv-f { font-size: 1.9vh; font-weight: 400; color: var(--dim); border-top: .5vh solid var(--frame); padding-top: 1.2vh; margin-top: 1.4vh; letter-spacing: .02em; }
+
+/* tela em pé (celular, só para testar): a caixa sobe por baixo em vez de vir pela lateral */
+@media (max-aspect-ratio: 1/1) {
+  :root { --boxw: 0px; }
+  .tv-gif { height: auto; width: min(70vw, 40vh); }
+  .tv-box { top: auto; left: 3vh; width: auto; height: 46vh; bottom: 3vh; transform: translateY(calc(100% + 8vh)); }
+  .tv.open .tv-stage { right: 0; bottom: 46vh; }
+  .tv-it, .tv-msg { font-size: 2.4vh; }
+}

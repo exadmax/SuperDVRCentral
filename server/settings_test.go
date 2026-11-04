@@ -296,6 +296,20 @@ func TestSettingsAI(t *testing.T) {
 	if w := put(mux, "/api/settings/ai", `{"provider":"off","model":"qwen3:8b","clearGroqKey":true}`); w.Code != 200 || m.aiConfig().GroqKey != "" || m.st.AI.Provider != "off" {
 		t.Fatalf("apagar chave: %d", w.Code)
 	}
+	// nome e voz do Omega: guardados com os espaços ajustados; em branco = sem tratamento / voz automática
+	if w := put(mux, "/api/settings/ai", `{"provider":"off","userName":"  Diogo \n Zanetti ","voice":"Microsoft Antonio Online (Natural)"}`); w.Code != 200 ||
+		m.aiConfig().UserName != "Diogo Zanetti" || m.aiConfig().Voice != "Microsoft Antonio Online (Natural)" {
+		t.Fatalf("nome e voz: %d %+v", w.Code, m.aiConfig())
+	}
+	if v := get(); v["userName"] != "Diogo Zanetti" || v["voice"] != "Microsoft Antonio Online (Natural)" {
+		t.Fatalf("leitura do nome e da voz: %v", v)
+	}
+	if w := put(mux, "/api/settings/ai", `{"provider":"off","userName":"`+strings.Repeat("a", omegaMaxName+1)+`"}`); w.Code != 400 {
+		t.Fatalf("nome longo deveria falhar: %d", w.Code)
+	}
+	if w := put(mux, "/api/settings/ai", `{"provider":"off","model":"qwen3:8b"}`); w.Code != 200 || m.aiConfig().UserName != "" || m.aiConfig().Voice != "" {
+		t.Fatalf("em branco limpa: %d %+v", w.Code, m.aiConfig())
+	}
 	var cfg Config
 	m.st.applyTo(&cfg)
 	if cfg.AI.Provider != "off" || cfg.AI.Model != "qwen3:8b" {

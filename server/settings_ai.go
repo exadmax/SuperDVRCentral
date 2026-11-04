@@ -17,6 +17,8 @@ type aiView struct {
 	OllamaURL  string `json:"ollamaURL"`
 	Model      string `json:"model"`
 	GroqModel  string `json:"groqModel"`
+	UserName   string `json:"userName"` // como o Omega chama o usuário (vazio = sem tratamento)
+	Voice      string `json:"voice"`    // voz de síntese do Omega (vazio = automática)
 	GroqKeySet bool   `json:"groqKeySet"`
 	GroqKey    string `json:"groqKey,omitempty"`      // só na gravação: vazio = manter a atual
 	ClearGroq  bool   `json:"clearGroqKey,omitempty"` // só na gravação: apaga a chave
@@ -31,7 +33,7 @@ func (m *settingsMgr) aiConfig() ai.Config {
 
 func (m *settingsMgr) aiView() aiView {
 	c := m.cfg.AI.WithDefaults()
-	return aiView{Provider: c.Provider, OllamaURL: c.OllamaURL, Model: c.Model, GroqModel: c.GroqModel, GroqKeySet: c.GroqKey != ""}
+	return aiView{Provider: c.Provider, OllamaURL: c.OllamaURL, Model: c.Model, GroqModel: c.GroqModel, UserName: c.UserName, Voice: c.Voice, GroqKeySet: c.GroqKey != ""}
 }
 
 func (m *settingsMgr) putAI(body []byte) (interface{}, error) {
@@ -61,6 +63,12 @@ func (m *settingsMgr) putAI(body []byte) (interface{}, error) {
 		return nil, err
 	}
 	if c.GroqModel, err = trimLen(in.GroqModel, 100, "modelo da Groq"); err != nil {
+		return nil, err
+	}
+	if c.UserName, err = trimLen(strings.Join(strings.Fields(in.UserName), " "), omegaMaxName, "nome"); err != nil {
+		return nil, err
+	}
+	if c.Voice, err = trimLen(in.Voice, 150, "voz"); err != nil {
 		return nil, err
 	}
 	if in.ClearGroq {

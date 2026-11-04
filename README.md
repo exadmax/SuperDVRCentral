@@ -42,7 +42,7 @@ servido por um **hub** em Go que fica em um servidor Linux da casa (pode ser um 
 | **Serviços** | Profissionais (eletricista, encanador...), com sincronização opcional com Google Planilhas | `contatos.html` |
 | **Vídeos** | Lista a pasta de vídeos do servidor; toca no navegador ou abre no VLC | `videos.html` |
 | **Livros** | PDFs e EPUBs no servidor, com envio pelo painel, categoria, dono e leitor de EPUB (desligável na Config) | `livros.html` |
-| **Omega** | Assistente por voz no estilo J.A.R.V.I.S. (só PC e celular): “Omega, me mostra a câmera da sala”, trânsito, agenda e perguntas livres pela IA (Groq ou Ollama), com painéis 3D (three.js), microfone e webcam ([docs/omega.md](docs/omega.md)) | `omega.html` |
+| **Omega** | Assistente por voz no estilo J.A.R.V.I.S.: “Omega, me mostra a câmera da sala”, trânsito, agenda e perguntas livres pela IA (Groq ou Ollama). No PC e no celular, com painéis 3D (three.js), microfone e webcam; na TV, com um GIF, uma caixa lateral de perguntas estilo Mega Drive e o microfone ([docs/omega.md](docs/omega.md)) | `omega.html` |
 | **Config** | CPU/memória do servidor; câmeras, agendas, trânsito, menu, painel, livros e integrações em abas, com ajuda embutida; desligar desktop/hub | `config.html` |
 | **Modo noturno** | Das 23h às 5h: tela escura com clima e eventos de amanhã | Início |
 | **Idiomas** | Português, English, Español e 中文, escolhido por aparelho (ou automático, pelo navegador) | Config → Idioma |

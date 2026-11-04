@@ -15,6 +15,9 @@ import (
 // testOmega monta o Omega com duas câmeras, uma pessoa e o provedor dado.
 func testOmega(t *testing.T, aiCfg ai.Config) (*omega, *http.ServeMux) {
 	t.Helper()
+	if aiCfg.UserName == "" { // os testes esperam o tratamento antigo; TestOmegaNomeDoUsuario cobre o nome em branco e o personalizado
+		aiCfg.UserName = omegaTitle
+	}
 	cams := newCameras([]CameraConfig{{ID: "sala", Name: "Sala de Estar", URL: "rtsp://x/y"}, {ID: "garagem", Name: "Garagem", URL: "rtsp://x/z"}})
 	tr := newTraffic(Config{Traffic: TrafficConfig{People: []Person{{ID: "cassia", Label: "Cássia"}}}})
 	o := newOmega(cams, tr, nil, func() ai.Config { return aiCfg }, nil)
@@ -75,6 +78,43 @@ func TestOmegaRegras(t *testing.T) {
 	}
 	if rep := ask(t, mux, "Omega, o que tenho amanhã?"); rep.Say != "Estes são os seus compromissos de amanhã, Comandante." {
 		t.Errorf("say agenda: %q", rep.Say)
+	}
+}
+
+func TestOmegaAddress(t *testing.T) {
+	cases := []struct{ in, name, want string }{
+		{"Exibindo a câmera Garagem, Comandante.", "", "Exibindo a câmera Garagem."},
+		{"Exibindo a câmera Garagem, Comandante.", "Diogo", "Exibindo a câmera Garagem, Diogo."},
+		{"Anotado, Comandante: 2 queijos.", "", "Anotado: 2 queijos."},
+		{"De quem, Comandante? Tenho as rotas de: Cássia.", "", "De quem? Tenho as rotas de: Cássia."},
+		{"Perdão, Comandante, não tenho uma boa resposta para isso.", "", "Perdão, não tenho uma boa resposta para isso."},
+		{"Nada vencido na geladeira, Comandante, mas 2 itens vencem.", "", "Nada vencido na geladeira, mas 2 itens vencem."},
+		{"Comandante, a Garagem está livre. Comandante, mais algo?", "", "A Garagem está livre. Mais algo?"},
+		{"Sem tratamento nenhum aqui.", "", "Sem tratamento nenhum aqui."},
+	}
+	for _, c := range cases {
+		if got := omegaAddress(c.in, c.name); got != c.want {
+			t.Errorf("omegaAddress(%q, %q) = %q; quero %q", c.in, c.name, got, c.want)
+		}
+	}
+}
+
+func TestOmegaNomeDoUsuario(t *testing.T) {
+	o, mux := testOmega(t, ai.Config{Provider: "off"})
+	name := ""
+	o.aiCfg = func() ai.Config { return ai.Config{Provider: "off", UserName: name} }
+	if rep := ask(t, mux, "Omega, o que tenho amanhã?"); rep.Say != "Estes são os seus compromissos de amanhã." {
+		t.Errorf("sem nome: %q", rep.Say)
+	}
+	name = "Diogo"
+	if rep := ask(t, mux, "Omega, o que tenho amanhã?"); rep.Say != "Estes são os seus compromissos de amanhã, Diogo." {
+		t.Errorf("com nome: %q", rep.Say)
+	}
+	if p := omegaSystemPrompt(o.now(), "Diogo", nil, nil); !strings.Contains(p, `"Diogo"`) || strings.Contains(p, "Comandante") {
+		t.Errorf("prompt com nome: %s", p)
+	}
+	if p := omegaSystemPrompt(o.now(), "", nil, nil); !strings.Contains(p, "Não use título") {
+		t.Errorf("prompt sem nome: %s", p)
 	}
 }
 

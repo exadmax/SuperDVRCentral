@@ -274,3 +274,30 @@ func TestOmegaSemBanco(t *testing.T) {
 		t.Errorf("%q", oc.Say)
 	}
 }
+
+// Cadastro com erro de digitação ("Encanaor") e pedido com palavras que o cadastro não tem ("pesquisa", "instalado") ainda acham o profissional.
+func TestOmegaServicosTolerancia(t *testing.T) {
+	o, mux := testOmegaDB(t, ai.Config{Provider: "off"})
+	for _, b := range []string{
+		`{"nome":"Leandro","tipoServico":"Encanaor","contato":"11 98671-5447","servico":"Pia e torneiras"}`,
+		`{"nome":"S+","tipoServico":"Placas solares","contato":"11 93099-2361","servico":"Instalação das placas solares"}`,
+	} {
+		if _, err := o.db.contatosAPI().create([]byte(b)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for text, want := range map[string]string{
+		"Omega, tem encanador nos serviços?":                "Leandro",
+		"Omega, preciso de um encanador":                    "Leandro",
+		"Omega, pesquisa serviços placa solar":              "S+",
+		"Omega, tem profissional instalado de placa solar?": "S+",
+	} {
+		if rep := ask(t, mux, text); rep.Source != "rule" || !strings.Contains(rep.Say, want) {
+			t.Errorf("%q: %+v", text, rep)
+		}
+	}
+	// uma letra a menos só vale em palavra longa: "pintor" não vira "pinto"
+	if omegaNear("pintor", "pinto") || !omegaNear("encanador", "encanaor") || omegaNear("eletricista", "encanador") {
+		t.Error("omegaNear")
+	}
+}

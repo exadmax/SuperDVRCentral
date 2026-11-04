@@ -11,25 +11,18 @@
 <body>
   <div class="om om-notice"><div><h1>OMEGA</h1></div></div>
 
-  <!-- Scripts clássicos (sem módulos ES). Página só para PC e celular: em TV mostra um aviso (js/omega/omega.js). -->
-  <script src="config/settings.example.js"></script>
-  <script src="config/settings.js" onerror="void 0"></script>
-  <script src="js/core/i18n.js"></script>
-  <script src="js/i18n/pt.js"></script>
-  <script src="js/i18n/en.js"></script>
-  <script src="js/i18n/es.js"></script>
-  <script src="js/i18n/zh.js"></script>
-  <script src="js/i18n/srv.js"></script>
-  <script src="js/core/util.js"></script>
-  <script src="js/core/icons.js"></script>
+  <!-- Scripts clássicos (sem módulos ES). Em TV (ou com ?tv=1, para testar no computador) vai para omega-tv.html, que não carrega
+       o three.js; nos outros aparelhos carrega a cena 3D. -->
   <script src="js/core/compat.js"></script>
-  <script src="js/services/hubApi.js"></script>
-  <script src="js/services/calendar.js"></script>
-  <script src="js/services/trafficApi.js"></script>
-  <script src="js/services/cameraPlayer.js"></script>
-  <script src="vendor/three/three.min.js"></script>
-  <script src="js/omega/scene.js"></script>
-  <script src="js/omega/voice.js"></script>
-  <script src="js/omega/omega.js"></script>
+  <script>
+    (function () {
+      if (window.CD.compat.detected() || /[?&]tv=1(&|$)/.test(location.search)) { location.replace('omega-tv.html'); return; }
+      ['config/settings.example.js', 'config/settings.js', 'js/core/i18n.js', 'js/i18n/pt.js', 'js/i18n/en.js', 'js/i18n/es.js', 'js/i18n/zh.js', 'js/i18n/srv.js',
+        'js/core/util.js', 'js/core/icons.js', 'js/services/hubApi.js', 'js/services/calendar.js', 'js/services/trafficApi.js', 'js/services/cameraPlayer.js',
+        'vendor/three/three.min.js', 'js/omega/scene.js', 'js/omega/voice.js', 'js/omega/omega.js'].forEach(function (s) {
+        document.write('<script src="' + s + '"' + (s === 'config/settings.js' ? ' onerror="void 0"' : '') + '><\/script>');   // settings.js é opcional
+      });
+    })();
+  </script>
 </body>
 </html>

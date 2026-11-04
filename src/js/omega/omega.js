@@ -1,6 +1,6 @@
 (function (CD) {
-  // Página Omega (omega.html): simulação de conversa com um assistente no estilo J.A.R.V.I.S. Só para PC/celular: TVs (Tizen,
-  // webOS...) recebem um aviso, porque não têm microfone, WebGL confiável nem desempenho para a cena 3D.
+  // Página Omega (omega.html): simulação de conversa com um assistente no estilo J.A.R.V.I.S. Para PC/celular: TVs (Tizen,
+  // webOS...) vão para omega-tv.html (GIF + caixa lateral, js/omega/tv.js), porque não têm WebGL confiável nem desempenho para a cena 3D.
   // Fluxo: voz ("Omega, ...") ou texto → POST /api/omega/ask (o hub entende o pedido: regra rápida ou IA) → {say, actions} →
   // a página mostra cada ação num painel 3D (câmera ao vivo, trânsito, agenda) e fala a resposta.
   const U = CD.util, esc = U.esc, t = CD.i18n.t;
@@ -289,7 +289,14 @@
 
   function greet() {
     const h = new Date().getHours();
-    reply(t(h < 12 ? 'om.greet.morning' : h < 18 ? 'om.greet.afternoon' : 'om.greet.evening'));
+    reply(t(h < 12 ? 'om.greet.morning' : h < 18 ? 'om.greet.afternoon' : 'om.greet.evening', { n: addr() }));
+  }
+
+  // Nome e voz escolhidos na Config > IA. Sem nome, o Omega não usa tratamento nenhum.
+  let me = '';
+  const addr = () => me ? t('om.addr', { n: me }) : '';
+  async function profile() {
+    try { const c = await CD.hubApi.ai.settings(); me = c.userName || ''; voice.setVoice(c.voice || ''); } catch (e) { /* hub antigo: sem nome, voz automática */ }
   }
 
   // ---------- sugestões ----------
@@ -321,12 +328,11 @@
 
   // ---------- início ----------
   async function boot() {
-    if (CD.compat && CD.compat.detected()) { notice(t('om.tv.title'), t('om.tv.text')); return; }
     if (!window.THREE || !CD.omegaScene.supported()) { notice(t('om.gl.title'), t('om.gl.text')); return; }
     document.title = 'Omega · DVR';
     shell();
     scene = CD.omegaScene.create($('om-gl'));
-    voice = CD.omegaVoice.create({ lang: CD.i18n.locale(), onWake: () => { scene.setMode('listening'); said(t('om.wake')); if (!muted) voice.speak(t('om.wakeReply')); },
+    voice = CD.omegaVoice.create({ lang: CD.i18n.locale(), onWake: () => { scene.setMode('listening'); said(t('om.wake')); if (!muted) voice.speak(t('om.wakeReply', { n: addr() })); },
       onInterim: s => heard(s, true), onCommand: s => ask(s), onState: () => {}, onSpeak: on => scene.setMode(on ? 'speaking' : (voice && voice.active() ? 'listening' : 'idle')),
       onError: e => { if (e === 'mic-denied') { st.mic = false; drawStatus(); reply(t('om.mic.denied')); } } });
     setInterval(() => { if (voice.active() && !selfStream) scene.setLevel(voice.level()); }, 80);
@@ -344,7 +350,7 @@
     if (base) { try { await U.getJson(base + '/api/health', 3000); CD.state.hub = base; } catch (e) { CD.state.hub = ''; } }
     if (!CD.state.hub) { st.ai = t('om.nohub'); st.aiBad = true; drawStatus(); said(t('om.nohub')); return; }
     try { await CD.hubApi.settings.loadPanel(cfg); } catch (e) { /* hub antigo: vale o padrão */ }
-    aiStatus(); suggestions();
+    aiStatus(); suggestions(); profile();
     said(t('om.hello'));
   }
 
