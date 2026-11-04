@@ -4,7 +4,10 @@
   // Arrastar gira a cena; clicar num painel traz para a frente (de novo: volta); Esc ou "limpar" tira todos.
   const MODE_COLOR = { idle: 0x4DA3FF, listening: 0x33E19A, thinking: 0xB48CFF, speaking: 0xFFB020, error: 0xFF6B6B };
   const MAX_PANELS = 3;
-  const SLOTS = [[3.9, 0.55, 0], [-3.9, 0.55, 0], [0, -2.75, 0.8]];  // onde os painéis param (ao redor do núcleo)
+  // onde os painéis param: [x, y, z, escala]. Tela larga: ao redor do núcleo. Estreita (celular, janela quase quadrada): o mais novo
+  // grande à frente do núcleo, os anteriores pequenos no alto.
+  const SLOTS = [[3.9, 0.55, 0, 1], [-3.9, 0.55, 0, 1], [0, -2.75, 0.8, 1]];
+  const SLOTS_NARROW = [[0, -0.9, 4.2, 1.05], [-1.9, 3.1, 1.5, 0.5], [1.9, 3.1, 1.5, 0.5]];
   const PANEL_H = 2.5;
 
   const VERT = [
@@ -72,7 +75,7 @@
     let mode = 'idle', level = 0, amp = 0, target = new THREE.Color(MODE_COLOR.idle);
     let yaw = 0, pitch = 0, vyaw = 0.0015, vpitch = 0, dragging = false, lastX = 0, lastY = 0, moved = 0;
     const panels = [];
-    let focused = null, raf = 0, t0 = performance.now(), alive = true;
+    let focused = null, raf = 0, t0 = performance.now(), alive = true, narrow = false;
 
     function setMode(m) { mode = MODE_COLOR[m] !== undefined ? m : 'idle'; target.setHex(MODE_COLOR[mode]); }
     function setLevel(v) { level = Math.max(0, Math.min(1, v || 0)); }
@@ -122,7 +125,7 @@
       return p;
     }
 
-    function layout() { panels.forEach((p, i) => { p.slot = SLOTS[i] || SLOTS[SLOTS.length - 1]; }); }
+    function layout() { const S = narrow ? SLOTS_NARROW : SLOTS; panels.forEach((p, i) => { p.slot = S[i] || S[S.length - 1]; }); }
 
     function remove(p) {
       const i = panels.indexOf(p);
@@ -166,8 +169,8 @@
       const w = canvas.clientWidth || window.innerWidth, h = canvas.clientHeight || window.innerHeight;
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
-      // telas estreitas: afasta a câmera para os painéis laterais caberem
-      camera.position.z = w / h < 1.2 ? 15 : 10;
+      narrow = w / h < 1.25;
+      layout();
       camera.updateProjectionMatrix();
     }
     window.addEventListener('resize', resize);
@@ -195,10 +198,10 @@
 
       panels.forEach((p, i) => {
         const f = focused === p;
-        const s = f ? [0, 0, 3.4] : p.slot;
+        const s = f ? (narrow ? [0, 0, 4.6, 1.15] : [0, 0, 3.4, 1.55]) : p.slot;
         tmp.set(s[0], s[1] + Math.sin(t * 0.8 + i) * 0.06, s[2]);
         p.group.position.lerp(tmp, 0.08);
-        const sc = f ? 1.55 : (focused ? 0.75 : 1);
+        const sc = s[3] * (!f && focused ? 0.75 : 1);
         p.group.scale.lerp(tmp.set(sc, sc, sc), 0.1);
         p.group.lookAt(camera.position);
         const age = (now - p.born) / 1000;

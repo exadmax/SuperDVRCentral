@@ -150,10 +150,11 @@
     const ok = r && typeof r.min === 'number' && r.min > 0;
     const color = ok ? LEVEL_COLOR[r.level] || '#4DA3FF' : '#FFB020';
     const leave = ok ? leaveAt(r.arriveBy, r.min) : '';
+    const why = !ok ? (r && r.reason ? CD.i18n.srv(r.reason) : r && r.manual ? t('om.tr.manual') : t('om.tr.none')) : '';  // home office, fora do horário...
     const c = CD.omegaScene.canvasTexture(1280, 720, (x, w, h) => {
       x.fillStyle = 'rgba(6,18,31,0.92)'; x.fillRect(0, 0, w, h);
       x.fillStyle = '#8FB7E0'; x.font = '500 44px Inter, sans-serif'; x.fillText(r && r.name ? r.name : t('om.tr.work'), 60, 90);
-      if (!ok) { x.fillStyle = '#FFB020'; x.font = '600 56px Inter, sans-serif'; x.fillText(CD.i18n.srv(r && r.message) || t('om.tr.none'), 60, 360); return; }
+      if (!ok) { x.fillStyle = '#FFB020'; x.font = '600 56px Inter, sans-serif'; x.fillText(why, 60, 360); return; }
       x.fillStyle = color; x.font = '700 200px Poppins, Inter, sans-serif'; x.fillText(String(r.min), 60, 330);
       const wmin = x.measureText(String(r.min)).width;
       x.font = '600 64px Inter, sans-serif'; x.fillText('min', 80 + wmin, 330);
@@ -169,7 +170,7 @@
       if (demo) { x.fillStyle = '#FFB020'; x.font = '500 34px Inter, sans-serif'; x.fillText(t('om.demo'), w - 260, 90); }
     });
     scene.add({ kind: 'traffic', key: 'tr:' + a.person, title: t('om.tr.title', { n: label }), texture: c.texture, aspect: 16 / 9, color: color });
-    if (!ok) return t('om.tr.none');
+    if (!ok) return t('om.tr.sayMsg', { n: label, msg: /[.!?。]$/.test(why) ? why : why + '.' });
     return t('om.tr.say', { n: label, m: r.min, l: t('om.tr.level.' + r.level) }) + (r.delay > 0 ? ' ' + t('om.tr.delay', { m: r.delay }) : '') +
       (leave ? ' ' + t('om.tr.leave', { h: leave }) + '.' : '') + (demo ? ' ' + t('om.demoSay') : '');
   }

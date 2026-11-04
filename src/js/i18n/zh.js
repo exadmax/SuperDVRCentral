@@ -211,6 +211,7 @@
     'om.cam.on': '摄像头已开', 'om.cam.off': '摄像头已关', 'om.mic.hint': '正在聆听。请说“Omega”加上您的请求。', 'om.mic.unsupported': '此浏览器不支持语音识别。请使用 Chrome 或 Edge，或直接输入。',
     'om.mic.denied': '麦克风被阻止。请在地址栏的锁形图标中允许访问。', 'om.cam.denied': '无法打开摄像头（被阻止或不存在）。', 'om.wake': '请讲？', 'om.wakeReply': '请讲，指挥官？',
     'om.greet.morning': '早上好，指挥官。需要我做什么？', 'om.greet.afternoon': '下午好，指挥官。需要我做什么？', 'om.greet.evening': '晚上好，指挥官。需要我做什么？', 'om.nohub': '没有 hub，Omega 无法工作：请通过服务器地址打开此页面。',
+    'om.tr.sayMsg': '{n}：{msg}', 'om.tr.manual': '尚未查询。',
     'om.demoSay': '（以上为示例数据。）', 'om.demo': '示例数据', 'om.live': '直播', 'om.connecting': '连接中…', 'om.cam.title': '摄像头 {n}',
     'om.cam.err': '无画面', 'om.tr.title': '交通 · {n}', 'om.tr.work': '去上班', 'om.tr.none': '目前没有交通数据。',
     'om.tr.level.livre': '畅通', 'om.tr.level.moderado': '缓行', 'om.tr.level.congestionado': '拥堵', 'om.tr.say': '{n} 去上班：{m} 分钟，交通{l}。',

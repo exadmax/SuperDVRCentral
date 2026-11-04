@@ -211,6 +211,7 @@
     'om.cam.on': 'Webcam activa', 'om.cam.off': 'Webcam apagada', 'om.mic.hint': 'Escuchando. Diga «Omega» y su pedido.', 'om.mic.unsupported': 'Este navegador no reconoce voz. Use Chrome o Edge, o escriba su pedido.',
     'om.mic.denied': 'El micrófono fue bloqueado. Permita el acceso en el candado de la barra de direcciones.', 'om.cam.denied': 'No pude abrir la webcam (bloqueada o inexistente).', 'om.wake': '¿Sí?', 'om.wakeReply': '¿Sí, Comandante?',
     'om.greet.morning': 'Buenos días, Comandante. ¿En qué puedo ayudar?', 'om.greet.afternoon': 'Buenas tardes, Comandante. ¿En qué puedo ayudar?', 'om.greet.evening': 'Buenas noches, Comandante. ¿En qué puedo ayudar?', 'om.nohub': 'Sin el hub, Omega no funciona: abra esta página desde la dirección del servidor.',
+    'om.tr.sayMsg': '{n}: {msg}', 'om.tr.manual': 'Aún no consultado.',
     'om.demoSay': '(Son datos de ejemplo.)', 'om.demo': 'datos de ejemplo', 'om.live': 'en vivo', 'om.connecting': 'conectando…', 'om.cam.title': 'Cámara {n}',
     'om.cam.err': 'sin imagen', 'om.tr.title': 'Tráfico · {n}', 'om.tr.work': 'Hasta el trabajo', 'om.tr.none': 'Sin datos de tráfico ahora.',
     'om.tr.level.livre': 'fluido', 'om.tr.level.moderado': 'moderado', 'om.tr.level.congestionado': 'congestionado', 'om.tr.say': 'Hasta el trabajo de {n}: {m} minutos, tráfico {l}.',

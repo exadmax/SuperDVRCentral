@@ -211,6 +211,7 @@
     'om.cam.on': 'Webcam on', 'om.cam.off': 'Webcam off', 'om.mic.hint': 'Listening. Say “Omega” and your request.', 'om.mic.unsupported': 'This browser cannot recognize speech. Use Chrome or Edge, or type your request.',
     'om.mic.denied': 'The microphone was blocked. Allow it from the lock icon in the address bar.', 'om.cam.denied': 'Could not open the webcam (blocked or missing).', 'om.wake': 'Yes?', 'om.wakeReply': 'Yes, Commander?',
     'om.greet.morning': 'Good morning, Commander. How can I help?', 'om.greet.afternoon': 'Good afternoon, Commander. How can I help?', 'om.greet.evening': 'Good evening, Commander. How can I help?', 'om.nohub': 'Omega needs the hub: open this page from the server address.',
+    'om.tr.sayMsg': '{n}: {msg}', 'om.tr.manual': 'Not checked yet.',
     'om.demoSay': '(This is sample data.)', 'om.demo': 'sample data', 'om.live': 'live', 'om.connecting': 'connecting…', 'om.cam.title': 'Camera {n}',
     'om.cam.err': 'no image', 'om.tr.title': 'Traffic · {n}', 'om.tr.work': 'To work', 'om.tr.none': 'No traffic data right now.',
     'om.tr.level.livre': 'clear', 'om.tr.level.moderado': 'moderate', 'om.tr.level.congestionado': 'heavy', 'om.tr.say': 'To {n}’s work: {m} minutes, {l} traffic.',
