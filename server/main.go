@@ -156,7 +156,7 @@ func main() {
 	sm.cams, sm.rec, sm.cal, sm.tr = cams, rec, cal, tr
 	sm.register(mux)
 	ai.Register(mux, sm.aiConfig)
-	newOmega(cams, tr, sm.aiConfig, cfg.AllowedOrigins).register(mux)
+	newOmega(cams, tr, db, sm.aiConfig, cfg.AllowedOrigins).register(mux)
 	sys := newSysMon()
 	go sys.loop()
 	mux.HandleFunc("/api/videos", videosHandler(cfg.Videos))

@@ -105,7 +105,30 @@
     if (a.type === 'camera') return showCamera(a);
     if (a.type === 'traffic') return showTraffic(a);
     if (a.type === 'agenda') return showAgenda(a);
+    if (a.type === 'list') return showList(a);
     return null;
+  }
+
+  // Lista pronta vinda do hub (estoque, serviços): {title, rows: [{text, sub, warn}], more}. A frase falada já vem no `say`.
+  function showList(a) {
+    const l = a.list;
+    if (!l || !l.rows) return '';
+    const warn = l.rows.some(r => r.warn), H = 64, color = warn ? '#FF6B6B' : '#4DA3FF';
+    const c = CD.omegaScene.canvasTexture(1280, 720, (x, w, h) => {
+      x.fillStyle = 'rgba(6,18,31,0.92)'; x.fillRect(0, 0, w, h);
+      x.fillStyle = '#8FB7E0'; x.font = '500 40px Inter, sans-serif'; x.fillText(trim(x, l.title, w - 100), 50, 70);
+      l.rows.forEach((r, i) => {
+        const y = 150 + i * (H + 8);
+        x.fillStyle = r.warn ? '#FF6B6B' : '#4DA3FF'; x.fillRect(50, y - 40, 8, 52);
+        x.font = '500 30px Inter, sans-serif';
+        const sub = trim(x, r.sub || '', 560), sw = x.measureText(sub).width;
+        x.fillStyle = r.warn ? '#FF9B9B' : '#8FB7E0'; x.fillText(sub, w - 50 - sw, y - 2);
+        x.fillStyle = '#E8F1FB'; x.font = '500 42px Inter, sans-serif'; x.fillText(trim(x, r.text, w - 190 - sw), 80, y);
+      });
+      if (l.more > 0) { x.fillStyle = '#8FB7E0'; x.font = '500 34px Inter, sans-serif'; x.fillText(t('om.ag.more', { n: l.more }), 80, 150 + l.rows.length * (H + 8)); }
+    });
+    scene.add({ kind: 'list', key: 'ls:' + l.title, title: l.title, texture: c.texture, aspect: 16 / 9, color: color });
+    return '';
   }
 
   function showCamera(a) {
@@ -282,7 +305,7 @@
       const p = (j.people || [])[0];
       if (p) sug.push(t('om.sug.traffic', { n: p.label }));
     } catch (e) { /* sem trânsito */ }
-    sug.push(t('om.sug.agenda'), t('om.sug.who'));
+    sug.push(t('om.sug.agenda'), t('om.sug.stock'), t('om.sug.who'));
     $('om-sug').innerHTML = sug.map(s => '<button type="button" class="om-chip on" data-say="' + esc(s) + '">' + esc(s) + '</button>').join('');
   }
 

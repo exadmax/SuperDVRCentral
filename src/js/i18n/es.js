@@ -218,7 +218,7 @@
     'om.tr.delay': 'Son {m} minutos más de lo normal.', 'om.tr.leave': 'Salga a las {h}', 'om.ag.title': 'Agenda · {d}', 'om.ag.today': 'hoy',
     'om.ag.tomorrow': 'mañana', 'om.ag.none': 'Ningún compromiso.', 'om.ag.allday': 'todo el día', 'om.ag.at': 'a las {h}',
     'om.ag.more': 'y {n} más', 'om.ag.count.one': 'Tiene {n} compromiso {d}', 'om.ag.count.other': 'Tiene {n} compromisos {d}', 'om.sug.cam': 'Omega, muéstrame la cámara {n}',
-    'om.sug.traffic': 'Omega, ¿cómo está el tráfico hasta el trabajo de {n}?', 'om.sug.agenda': 'Omega, ¿cuáles son los compromisos de hoy?', 'om.sug.who': 'Omega, ¿quién eres?', 'om.tv.title': 'No disponible en TV',
+    'om.sug.traffic': 'Omega, ¿cómo está el tráfico hasta el trabajo de {n}?', 'om.sug.agenda': 'Omega, ¿cuáles son los compromisos de hoy?', 'om.sug.who': 'Omega, ¿quién eres?', 'om.sug.stock': 'Omega, ¿hay algo vencido en el inventario?', 'om.tv.title': 'No disponible en TV',
     'om.tv.text': 'El modo Omega necesita micrófono, cámara y gráficos 3D, que los navegadores de TV (Tizen, webOS) no tienen. Ábralo en el ordenador o el móvil.', 'om.gl.title': 'Gráficos 3D no disponibles', 'om.gl.text': 'Este navegador no tiene WebGL activado. Actualice el navegador o active la aceleración por hardware.',
     'cp.secretSet': 'configurada (en blanco = mantener)', 'cp.secretPaste': 'pegue aquí', 'cp.secretClear': 'borrar la configurada',
     'cp.restartNote': 'Vale después de reiniciar el hub.',

@@ -33,6 +33,7 @@ const (
 type omega struct {
 	cams   *cameras
 	tr     *traffic
+	db     *store // estoque e serviços (nil = banco indisponível)
 	aiCfg  func() ai.Config
 	st     *store       // só para checkWrite (origem)
 	client *http.Client // nil = o padrão do ai.Complete
@@ -44,12 +45,13 @@ type omega struct {
 
 // omegaAction é uma ação que a interface executa. Só os campos do tipo vêm preenchidos.
 type omegaAction struct {
-	Type   string `json:"type"` // camera | traffic | agenda
-	ID     string `json:"id,omitempty"`
-	Name   string `json:"name,omitempty"`
-	Person string `json:"person,omitempty"`
-	Label  string `json:"label,omitempty"`
-	Day    string `json:"day,omitempty"` // today | tomorrow
+	Type   string     `json:"type"` // camera | traffic | agenda | list
+	ID     string     `json:"id,omitempty"`
+	Name   string     `json:"name,omitempty"`
+	Person string     `json:"person,omitempty"`
+	Label  string     `json:"label,omitempty"`
+	Day    string     `json:"day,omitempty"`  // today | tomorrow
+	List   *omegaList `json:"list,omitempty"` // lista pronta (estoque, serviços)
 }
 
 type omegaReply struct {
@@ -66,8 +68,8 @@ type omegaMsg struct {
 
 type omegaItem struct{ id, name string } // câmera ou pessoa, como o Omega conhece
 
-func newOmega(cams *cameras, tr *traffic, aiCfg func() ai.Config, origins []string) *omega {
-	return &omega{cams: cams, tr: tr, aiCfg: aiCfg, st: &store{origins: origins}, now: time.Now}
+func newOmega(cams *cameras, tr *traffic, db *store, aiCfg func() ai.Config, origins []string) *omega {
+	return &omega{cams: cams, tr: tr, db: db, aiCfg: aiCfg, st: &store{origins: origins}, now: time.Now}
 }
 
 // register registra POST /api/omega/ask: {"text": "...", "history": [{"role","content"}]} -> omegaReply.
@@ -114,34 +116,67 @@ func (o *omega) ask(w http.ResponseWriter, r *http.Request) {
 
 	cfg := o.aiCfg().WithDefaults()
 	cams, people := o.cameraList(), o.peopleList()
-	if rep, ok := omegaRules(omegaNormalize(text), cams, people); ok {
-		rep.Provider = cfg.Provider
-		writeJSON(w, rep)
-		return
+	norm := omegaNormalize(text)
+	for _, rule := range []func() (omegaReply, bool){
+		func() (omegaReply, bool) { return o.dataRules(norm) }, // estoque/serviços citados explicitamente vêm antes (ex.: "o que tenho no estoque" não é agenda)
+		func() (omegaReply, bool) { return omegaRules(norm, cams, people) },
+		func() (omegaReply, bool) { return o.serviceTypeRule(norm) },
+	} {
+		if rep, ok := rule(); ok {
+			rep.Provider = cfg.Provider
+			writeJSON(w, rep)
+			return
+		}
 	}
 
 	rep := omegaReply{Source: "llm", Provider: cfg.Provider, Actions: []omegaAction{}}
-	out, err := ai.Complete(r.Context(), cfg, o.client, ai.ChatRequest{
-		Messages:    o.messages(text, req.History, cams, people),
-		Tools:       omegaTools(cams, people),
-		Temperature: omegaTemperature,
-		MaxTokens:   omegaMaxTokens,
-	})
+	msgs, tools := o.messages(text, req.History, cams, people), omegaTools(cams, people, o.dataTools())
+	var (
+		out      ai.ChatReply
+		dataSays []string // o que as ferramentas de estoque/serviços fizeram, caso o modelo fique mudo ou a IA caia no meio
+	)
+	for round := 1; ; round++ {
+		out, err = ai.Complete(r.Context(), cfg, o.client, ai.ChatRequest{Messages: msgs, Tools: tools, Temperature: omegaTemperature, MaxTokens: omegaMaxTokens})
+		if err != nil {
+			break
+		}
+		rep.Actions = append(rep.Actions, omegaToolActions(out.ToolCalls, cams, people)...)
+		if round >= omegaMaxRounds || !omegaHasDataCall(out.ToolCalls) {
+			break
+		}
+		// ferramentas de dados: o hub executa e devolve o resultado ao modelo, que então responde (toda chamada precisa de resposta)
+		msgs = append(msgs, ai.Message{Role: "assistant", Content: out.Content, ToolCalls: out.ToolCalls})
+		for _, c := range out.ToolCalls {
+			res := `{"ok":true}`
+			if oc, ok := o.runDataTool(c.Name, c.Arguments); ok {
+				res = oc.Data
+				dataSays = append(dataSays, oc.Say)
+				if oc.Action != nil {
+					rep.Actions = append(rep.Actions, *oc.Action)
+				}
+			}
+			msgs = append(msgs, ai.Message{Role: "tool", ToolCallID: c.ID, Name: c.Name, Content: res})
+		}
+	}
 	if err != nil {
 		if cfg.Provider != ai.ProviderOff {
 			log.Printf("omega: %v", err)
 		}
 		rep.Source = "none"
 		rep.Say = "Não consegui falar com a IA agora: " + shortReason(err.Error())
+		if len(dataSays) > 0 { // já alterou algo: o usuário precisa saber
+			rep.Say = strings.Join(dataSays, " ")
+		}
 		writeJSON(w, rep)
 		return
 	}
-	rep.Actions = omegaToolActions(out.ToolCalls, cams, people)
 	rep.Say = omegaClean(out.Content)
 	if rep.Say == "" {
-		var says []string
+		says := dataSays
 		for _, a := range rep.Actions {
-			says = append(says, omegaActionSay(a))
+			if s := omegaActionSay(a); s != "" {
+				says = append(says, s)
+			}
 		}
 		rep.Say = strings.Join(says, " ")
 	}
@@ -381,7 +416,7 @@ func omegaActionSay(a omegaAction) string {
 // ---- LLM ----
 
 func (o *omega) messages(text string, history []omegaMsg, cams, people []omegaItem) []ai.Message {
-	msgs := []ai.Message{{Role: "system", Content: omegaSystemPrompt(o.now(), cams, people)}}
+	msgs := []ai.Message{{Role: "system", Content: omegaSystemPrompt(o.now(), cams, people) + o.dataPrompt()}}
 	var hist []ai.Message
 	for _, m := range history {
 		c := strings.TrimSpace(m.Content)
@@ -430,8 +465,8 @@ func omegaListPrompt(items []omegaItem) string {
 	return strings.Join(s, "; ")
 }
 
-// omegaTools monta as ferramentas; a que teria lista vazia fica de fora.
-func omegaTools(cams, people []omegaItem) []ai.Tool {
+// omegaTools monta as ferramentas; a que teria lista vazia fica de fora. extra: as de estoque e serviços (omega.dataTools).
+func omegaTools(cams, people []omegaItem, extra []ai.Tool) []ai.Tool {
 	var tools []ai.Tool
 	if len(cams) > 0 {
 		tools = append(tools, ai.Tool{Name: "show_camera", Description: "Mostra na tela a imagem ao vivo de uma câmera da casa.",
@@ -443,7 +478,7 @@ func omegaTools(cams, people []omegaItem) []ai.Tool {
 	}
 	tools = append(tools, ai.Tool{Name: "show_agenda", Description: "Mostra os compromissos da agenda de hoje ou de amanhã.",
 		Parameters: omegaEnumSchema("day", "today (hoje) ou tomorrow (amanhã)", []string{omegaDayToday, omegaDayTomorrow})})
-	return tools
+	return append(tools, extra...)
 }
 
 func omegaIDs(items []omegaItem) []string {
