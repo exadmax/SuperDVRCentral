@@ -1,0 +1,90 @@
+{
+  "name": "SuperDVRCentral",
+  "git": {
+    "base": "main",
+    "prefix": "tao/"
+  },
+  "agents": [
+    {
+      "id": "orquestrador",
+      "name": "Orquestrador",
+      "role": "Planeja e quebra tarefas; responde dúvidas do time",
+      "emblem": "gestao",
+      "face": "av_p_robo",
+      "client": "claude",
+      "tier": "medium",
+      "instructions": "Mapa do projeto em AGENTS.md; plano em docs/MILESTONES.md. Planeje tarefas pequenas, cada uma com arquivos a mexer e comando de conferência no campo done."
+    },
+    {
+      "id": "arquiteto",
+      "name": "Arquiteto",
+      "role": "IA, ferramentas, memória, ações de sistema, facesvc e vídeo",
+      "emblem": "planejamento",
+      "face": "av_h2",
+      "client": "claude",
+      "tier": "senior",
+      "parent": "orquestrador",
+      "fallback": "eng-front",
+      "instructions": "Leia AGENTS.md e só os arquivos que a tarefa cita. Hub sem CGO; modelos fora do processo do hub. Testes com httptest/arquivos de exemplo, sem rede real."
+    },
+    {
+      "id": "eng-go",
+      "name": "Engenheiro Go",
+      "role": "Servidor Go: rotas, banco, configuração, instaladores",
+      "emblem": "codigo",
+      "face": "av_h4",
+      "client": "codex",
+      "tier": "medium",
+      "parent": "orquestrador",
+      "fallback": "arquiteto",
+      "instructions": "Leia AGENTS.md e só os arquivos que a tarefa cita. Migrações só no fim de migrations em server/db.go. Código de sistema em _windows.go/_linux.go/_other.go."
+    },
+    {
+      "id": "eng-front",
+      "name": "Engenheira Front",
+      "role": "Interface TV (src/) e PC (src/pc/), traduções",
+      "emblem": "visual",
+      "face": "av_f3",
+      "client": "claude",
+      "tier": "medium",
+      "parent": "orquestrador",
+      "fallback": "eng-go",
+      "instructions": "Leia AGENTS.md. Interface TV em JS clássico (sem módulos ES). Textos novos em src/js/i18n/pt.js e depois en/es/zh; rode node scripts/check-i18n.js."
+    },
+    {
+      "id": "junior",
+      "name": "Júnior",
+      "role": "Renomeações, documentação e tarefas mecânicas",
+      "emblem": "producao",
+      "face": "av_t_exec",
+      "client": "opencode",
+      "tier": "junior",
+      "parent": "orquestrador",
+      "fallback": "eng-go",
+      "instructions": "Leia AGENTS.md. Faça só a troca pedida, sem refatorar. Ignore docs/design/ e docs/img/."
+    },
+    {
+      "id": "revisor",
+      "name": "Revisora",
+      "role": "Revisão de código e critério de pronto",
+      "emblem": "revisao",
+      "face": "av_f2",
+      "client": "gemini",
+      "tier": "medium",
+      "parent": "orquestrador",
+      "fallback": "revisor-opencode",
+      "instructions": "Confira só os arquivos do diff e o critério de pronto da tarefa; rode o comando de conferência citado."
+    },
+    {
+      "id": "revisor-opencode",
+      "name": "Revisor reserva",
+      "role": "Revisão quando a revisora principal não pode",
+      "emblem": "revisao",
+      "face": "av_h6",
+      "client": "opencode",
+      "tier": "medium",
+      "parent": "orquestrador",
+      "instructions": "Confira só os arquivos do diff e o critério de pronto da tarefa; rode o comando de conferência citado."
+    }
+  ]
+}

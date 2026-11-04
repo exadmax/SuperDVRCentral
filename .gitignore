@@ -1,0 +1,25 @@
+node_modules/
+src/config/settings.js
+src/vendor/zetaoffice/
+build/
+
+server/hub.config.json
+server/dist/
+server/games.state.json
+
+# binários locais, bancos SQLite e chaves (nunca versionar)
+*.exe
+*.db
+*.db-wal
+*.db-shm
+key/
+
+# ferramentas locais do Claude Code (operam o servidor pessoal)
+.claude/agents/
+.claude/skills/
+.claude/settings.local.json
+
+# instância de demonstração (server/demo): só o hub.config.json é versionado
+server/demo/*
+!server/demo/hub.config.json
+!server/demo/README.md

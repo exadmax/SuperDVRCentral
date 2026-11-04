@@ -1,0 +1,2 @@
+- Traduções do painel: `node scripts/check-i18n.js` confere se pt/en/es/zh têm as mesmas chaves e o mesmo manual (rode depois de mudar textos em `src/js/i18n/`).
+- Hub (servidor): `server/package.sh` gera `server/dist/centraldiogo.tgz`; no Linux: `sudo bash install.sh` (ver server/).

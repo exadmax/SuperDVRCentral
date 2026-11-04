@@ -1,0 +1,13 @@
+﻿Central Diogo para Windows
+
+1. Extraia este .zip inteiro (clique com o botao direito > Extrair tudo).
+2. Abra a pasta extraida e de dois cliques em "Instalar.cmd".
+3. Na janela, escolha como vai usar:
+   - Servidor da casa: o computador fica ligado e atende os outros aparelhos da casa (pede permissao de administrador).
+   - Meu computador: so para voce, neste PC (nao abre nada na rede).
+4. Clique em Instalar e depois em "Abrir o Central Diogo".
+
+Para atualizar, extraia a versao nova e abra o Instalar.cmd de novo: seus dados sao mantidos.
+Para remover: Configuracoes do Windows > Aplicativos > Central Diogo, ou o Desinstalar.cmd da pasta de instalacao.
+
+O painel nao tem login: use so na rede da sua casa e nao exponha a internet (veja SECURITY.md no GitHub).

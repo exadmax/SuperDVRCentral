@@ -1,0 +1,20 @@
+[Unit]
+Description=Central Diogo hub (painel + API)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=__USER__
+WorkingDirectory=/opt/centraldiogo
+ExecStart=/opt/centraldiogo/hub -config /opt/centraldiogo/hub.config.json
+# porta 80 sem rodar como root
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+NoNewPrivileges=true
+Restart=always
+RestartSec=5
+# máquina com pouca memória (o rclone da cópia diária para o Drive roda dentro deste limite)
+MemoryMax=400M
+
+[Install]
+WantedBy=multi-user.target

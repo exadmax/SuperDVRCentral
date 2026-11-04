@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "central-diogo", "runtimeExecutable": "python", "runtimeArgs": ["-m", "http.server", "5173", "--directory", "src"], "port": 5173 }
+  ]
+}

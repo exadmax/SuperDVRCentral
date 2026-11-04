@@ -1,0 +1,51 @@
+name: Release
+
+# Publica uma release a cada tag vX.Y.Z (ou vX.Y.Z-rc.1). Política em docs/versionamento.md.
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+', 'v[0-9]+.[0-9]+.[0-9]+-*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: A tag precisa estar na main
+        run: |
+          git fetch origin main
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main || { echo "::error::a tag $GITHUB_REF_NAME não está na main"; exit 1; }
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: server/go.mod
+
+      - name: Testes
+        working-directory: server
+        run: go vet ./... && go test ./...
+
+      - name: Traduções
+        run: node scripts/check-i18n.js
+
+      - name: Empacotar
+        working-directory: server
+        run: ./package.sh "$GITHUB_REF_NAME"
+
+      - name: Reunir arquivos e checksums
+        run: |
+          mkdir out
+          cp server/dist/centraldiogo.tgz server/dist/centraldiogo-windows.zip server/dist/hub-linux-* out/
+          cd out && sha256sum * > SHA256SUMS && cat SHA256SUMS
+
+      - name: Criar a release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PRE=""
+          case "$GITHUB_REF_NAME" in *-*) PRE="--prerelease";; esac
+          gh release create "$GITHUB_REF_NAME" out/* --title "Central Diogo ${GITHUB_REF_NAME#v}" --generate-notes $PRE

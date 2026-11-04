@@ -1,0 +1,8 @@
+# Ripgrep e ferramentas dos agentes ignoram estes caminhos nas buscas (economia de tokens).
+docs/design/
+docs/img/
+*.onnx
+*.mp4
+*.woff2
+*.png
+*.jpg
