@@ -8,7 +8,11 @@ registrando a mudança no próprio arquivo ou aqui.
 
 ## No navegador (painel)
 
-O painel (`src/`) não embute bibliotecas de terceiros: só fontes (Inter e Poppins, licença SIL OFL 1.1) em `src/assets/fonts/`.
+O painel (`src/`) usa fontes Inter e Poppins (licença SIL OFL 1.1) em `src/assets/fonts/` e uma biblioteca:
+
+| Componente | Onde | Versão | Licença | Alterações |
+|---|---|---|---|---|
+| **three.js** — https://github.com/mrdoob/three.js | `src/vendor/three/three.min.js` (só a página Omega) | r128 | **MIT** (cabeçalho do arquivo) | Nenhuma ([LEIA-ME](../src/vendor/three/LEIA-ME.md), com o SHA-256) |
 
 ## No servidor (Go)
 

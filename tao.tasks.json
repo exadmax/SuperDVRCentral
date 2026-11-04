@@ -69,6 +69,19 @@
       "goal": "Instaladores Windows/Linux com GPU, Ollama, Piper, ffmpeg e facesvc",
       "status": "planned",
       "created": "2026-11-03T21:00:00-03:00"
+    },
+    {
+      "id": "S10",
+      "title": "Omega (antecipado)",
+      "goal": "Página Omega: assistente por voz com cena 3D, câmera, trânsito, agenda e IA pela Groq",
+      "status": "closed",
+      "created": "2026-11-04T14:00:00-03:00",
+      "started": "2026-11-04T10:00:00-03:00",
+      "closed": "2026-11-04T14:00:00-03:00",
+      "retro": [
+        "Regras no hub para câmera/trânsito/agenda respondem na hora e sem gastar a IA; a IA fica para o resto.",
+        "O painel de navegador do app bloqueia microfone: testar voz no Chrome/Edge."
+      ]
     }
   ],
   "tasks": [
@@ -701,6 +714,50 @@
       "origin": "plan",
       "created": "2026-11-03T21:00:00-03:00",
       "updated": "2026-11-03T21:00:00-03:00"
+    },
+    {
+      "id": "T045",
+      "title": "Omega no servidor: POST /api/omega/ask",
+      "done": "server/omega.go e server/ai/llm.go com regras para câmera/trânsito/agenda, IA com ferramentas (Groq/Ollama), origem e limite de taxa; testes.",
+      "assignee": "arquiteto",
+      "sprint": "S10",
+      "status": "done",
+      "priority": "high",
+      "origin": "plan",
+      "approved": true,
+      "branch": "feat/omega",
+      "summary": "Rota pronta e testada com a Groq real; regras sem acento, ferramentas show_camera/show_traffic/show_agenda, 20 pedidos/min, chave nunca devolvida.",
+      "created": "2026-11-04T14:00:00-03:00",
+      "updated": "2026-11-04T14:00:00-03:00",
+      "history": [
+        {
+          "at": "2026-11-04T14:00:00-03:00",
+          "by": "claude-code",
+          "what": "Feito fora do TAO (sessão do Claude Code com subagente), na branch feat/omega; verificado com go test e no navegador."
+        }
+      ]
+    },
+    {
+      "id": "T046",
+      "title": "Página Omega com three.js, voz e webcam",
+      "done": "src/omega.html, css/omega.css, js/omega/{scene,voice,omega}.js, three.js r128 em src/vendor; atalho no menu escondido em TVs; 4 idiomas.",
+      "assignee": "eng-front",
+      "sprint": "S10",
+      "status": "done",
+      "priority": "high",
+      "origin": "plan",
+      "approved": true,
+      "branch": "feat/omega",
+      "summary": "Painéis 3D de câmera ao vivo, trânsito e agenda; palavra de ativação 'Omega' (Web Speech), fala do sistema, webcam como sensor de presença; aviso em TVs.",
+      "created": "2026-11-04T14:00:00-03:00",
+      "updated": "2026-11-04T14:00:00-03:00",
+      "history": [
+        {
+          "at": "2026-11-04T14:00:00-03:00",
+          "by": "claude-code",
+          "what": "Feito fora do TAO (sessão do Claude Code com subagente), na branch feat/omega; verificado com go test e no navegador."
+        }
+      ]
     }
   ]
 }

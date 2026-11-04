@@ -5,7 +5,7 @@
   // Esta área só é redesenhada por ações do usuário (nunca pelo recarregamento periódico da página), para não perder o que está sendo digitado.
   const U = CD.util, esc = U.esc, t = CD.i18n.t;
   const ICONS = ['gamepad', 'fridge', 'phone', 'camera', 'music', 'film', 'folder', 'gear', 'home', 'link', 'box', 'clock', 'mail', 'user', 'pin', 'trophy',
-    'umbrella', 'search', 'book', 'desktop'].map(id => [id, t('ico.' + id)]);
+    'umbrella', 'search', 'book', 'desktop', 'omega'].map(id => [id, t('ico.' + id)]);
   const DAYS = [1, 2, 3, 4, 5, 6, 0].map(d => [d, t('date.daysShort')[d]]);
   const HEX = /^#[0-9a-fA-F]{6}$/;
 

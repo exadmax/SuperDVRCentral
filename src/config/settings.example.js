@@ -16,6 +16,7 @@ window.CD_SETTINGS = {
     { label: 'Música', sub: 'Navidrome', icon: 'music',   port: 4533, path: '/' },
     { label: 'Vídeos', sub: 'Abrir no VLC', icon: 'film', path: '/videos.html' },
     { label: 'Livros', sub: 'PDF e EPUB', icon: 'book', path: '/livros.html' },
+    { label: 'Omega', sub: 'Assistente', icon: 'omega', path: '/omega.html' },   // some sozinho em TVs (widgets/links.js)
     { label: 'Config', sub: 'Servidor', icon: 'gear', path: '/config.html' }
   ],
 

@@ -27,6 +27,7 @@ Legenda de **Precisa do hub**: ✅ só funciona com o hub no ar · ➖ funciona 
 | **Câmeras** | `camaras.html` + `js/pages/camaras.js` | Câmeras | ✅ | Imagem ao vivo de cada câmera e lista de gravações (assistir/baixar) |
 | **Vídeos** | `videos.html` + `js/pages/videos.js` | Vídeos | ✅ | Lista a pasta de vídeos; tocar no navegador, abrir no VLC, copiar link |
 | **Livros** | `livros.html` + `js/pages/livros.js` | Livros | ✅ | PDFs e EPUBs no servidor: envio pelo painel, categoria e dono, leitor de EPUB; pode ser desligada na Config |
+| **Omega** | `omega.html` + `js/omega/*.js` | Omega | ✅ | Assistente por voz com cena 3D (three.js): câmera, trânsito, agenda e perguntas à IA; indisponível em TVs ([omega.md](omega.md)) |
 | **Config** | `config.html` + `js/pages/config.js` | Config | ✅ | CPU/memória do servidor, botões de energia e configuração das gravações |
 | Jogos (externo) | — | Jogos | ➖ | Abre o WebRCade (porta 8080) |
 | Música (externo) | — | Música | ➖ | Abre o Navidrome (porta 4533) |
@@ -140,6 +141,7 @@ Todas as rotas respondem JSON (exceto vídeo/arquivos) com `Cache-Control: no-st
 | `GET /api/system` | CPU/memória da máquina e do hub, `control`, `desktop` | `sysinfo.go` |
 | `POST /api/admin/desktop-off` | Para o display manager (exige `X-CD-Action: confirm`) | `power.go` |
 | `GET /api/ai/hardware` | GPUs (nome, fabricante, integrada, memória dedicada/compartilhada), memória efetiva para um modelo, modelos sugeridos e catálogo | `ai/hardware*.go`, `ai/catalog.go`, `ai/routes.go` |
+| `POST /api/omega/ask` | `{text, history}` → `{say, actions[camera\|traffic\|agenda], source, provider}`; origem do hub, 20/min | `omega.go`, `ai/llm.go` |
 | `GET /api/ai/status` | Provedor ativo; Ollama alcançável, versão e modelos instalados (cabe/não cabe na GPU); Groq configurada (nunca devolve a chave) | `ai/status.go` |
 | `GET` / `PUT /api/settings/ai` | Aba IA da Config: provedor, endereço do Ollama, modelo, modelo e chave da Groq (`groqKeySet`; chave vazia = manter, `clearGroqKey` apaga) | `settings_ai.go` |
 | `POST /api/admin/hub-off` | Para o serviço do hub (exige `X-CD-Action: confirm`) | `power.go` |
