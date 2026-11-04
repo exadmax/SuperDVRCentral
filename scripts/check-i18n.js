@@ -64,7 +64,7 @@ walk(path.join(SRC, 'js'), []).forEach(f => {
 used.forEach(k => { if (D.pt[k] == null) fail('chave usada no código e ausente no pt: ' + k); });
 // chaves montadas com + (prefixo + valor): precisam estar listadas aqui
 const DYNAMIC = {
-  'wx.period.': ['morning', 'afternoon', 'night'], 'cfg.tab.': ['servidor', 'cameras', 'agendas', 'painel', 'menu', 'integracoes', 'idioma', 'compat', 'ajuda'],
+  'wx.period.': ['morning', 'afternoon', 'night'], 'om.tr.level.': ['livre', 'moderado', 'congestionado'], 'cfg.tab.': ['servidor', 'cameras', 'agendas', 'painel', 'menu', 'integracoes', 'ia', 'idioma', 'compat', 'ajuda'],
   'ico.': ['gamepad', 'fridge', 'phone', 'camera', 'music', 'film', 'folder', 'gear', 'home', 'link', 'box', 'clock', 'mail', 'user', 'pin', 'trophy', 'umbrella', 'search'],
   'hol.type.': ['municipal', 'estadual', 'nacional'], 'pill.holiday.': ['municipal', 'estadual', 'nacional']
 };

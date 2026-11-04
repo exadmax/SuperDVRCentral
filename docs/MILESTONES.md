@@ -52,6 +52,11 @@ vet, testes (Windows e Linux) e traduções em cada PR.
 | Aba IA da Config | `eng-front` |
 | Renomear interface e documentos | `junior` |
 
+## Omega (antecipado em 04/11/2026)
+O dono pediu a página **Omega** antes da M1: assistente por voz com cena 3D, câmera, trânsito e agenda, IA pela Groq
+([omega.md](omega.md)). Ela adianta partes da M1 (interface PC), M2 (IA), M3 (ferramentas de câmera/trânsito/agenda) e M4 (voz no navegador);
+as tarefas dessas sprints continuam valendo e passam a evoluir o Omega em vez de criar uma tela nova.
+
 ## M1 — Interface PC sem IA (S2)
 Pronto quando: `/pc/` abre o HUD do JARVIS servido pelo hub (sem Python, Node nem Electron), com câmeras ao vivo, agenda, clima, trânsito,
 estoque a vencer e o estado do servidor (inclusive GPU); a TV continua igual e as duas se alcançam por atalho.

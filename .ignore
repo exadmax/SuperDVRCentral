@@ -6,3 +6,4 @@ docs/img/
 *.woff2
 *.png
 *.jpg
+src/vendor/

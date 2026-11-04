@@ -1,0 +1,67 @@
+/* Página Omega (omega.html): HUD sobre a cena 3D. Cores do painel: azul #4DA3FF, verde #33E19A, âmbar #FFB020, vermelho #FF6B6B. */
+@font-face { font-family: 'Inter'; src: url('../assets/fonts/inter-latin.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'Poppins'; src: url('../assets/fonts/poppins-600.woff2') format('woff2'); font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Poppins'; src: url('../assets/fonts/poppins-700.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+
+:root { --bg: #02060D; --fg: #E8F1FB; --dim: #8FB7E0; --blue: #4DA3FF; --green: #33E19A; --amber: #FFB020; --red: #FF6B6B; --glass: rgba(8, 22, 40, .62); --line: rgba(77, 163, 255, .35); }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: radial-gradient(ellipse at 50% 45%, #0A1A2E 0%, var(--bg) 70%); color: var(--fg); font: 16px/1.4 Inter, system-ui, sans-serif; overflow: hidden; }
+
+.om { position: fixed; inset: 0; }
+.om-gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+.om-gl:active { cursor: grabbing; }
+
+.om-top { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 14px; padding: 14px 18px; pointer-events: none; }
+.om-top > * { pointer-events: auto; }
+.om-back { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; color: var(--fg); background: var(--glass); border: 1px solid var(--line); text-decoration: none; }
+.om-brand { display: flex; flex-direction: column; }
+.om-brand b { font: 700 22px/1 Poppins, Inter, sans-serif; letter-spacing: .35em; color: var(--blue); text-shadow: 0 0 18px rgba(77, 163, 255, .6); }
+.om-brand span { font-size: 12px; color: var(--dim); letter-spacing: .12em; text-transform: uppercase; margin-top: 4px; }
+.om-chips { margin-left: auto; display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.om-chip { font-size: 12px; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--glass); color: var(--dim); white-space: nowrap; }
+.om-chip.on { color: var(--fg); border-color: rgba(51, 225, 154, .55); }
+.om-chip.bad { color: var(--red); border-color: rgba(255, 107, 107, .55); }
+button.om-chip { cursor: pointer; font: inherit; font-size: 13px; }
+button.om-chip:hover { border-color: var(--blue); color: var(--fg); }
+
+.om-sub { position: absolute; left: 50%; bottom: 150px; transform: translateX(-50%); width: min(880px, calc(100% - 32px)); text-align: center; pointer-events: none; }
+.om-heard { color: var(--dim); font-size: 17px; min-height: 1.4em; font-style: italic; }
+.om-heard.interim { opacity: .7; }
+.om-said { font-size: 22px; font-weight: 500; text-shadow: 0 2px 12px rgba(0, 0, 0, .8); margin-top: 6px; max-height: 6.2em; overflow: hidden; }
+
+.om-log { position: absolute; right: 16px; top: 76px; width: 300px; max-height: calc(100% - 260px); overflow: hidden; display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+  -webkit-mask-image: linear-gradient(#000 70%, transparent); mask-image: linear-gradient(#000 70%, transparent); }
+.om-msg { font-size: 13px; padding: 8px 10px; border-radius: 10px; background: var(--glass); border: 1px solid var(--line); }
+.om-msg b { display: block; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--blue); margin-bottom: 2px; }
+.om-msg.me b { color: var(--green); }
+
+.om-sug { position: absolute; left: 50%; bottom: 92px; transform: translateX(-50%); display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: min(900px, calc(100% - 32px)); }
+
+.om-ask { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); width: min(880px, calc(100% - 32px)); display: flex; gap: 8px; align-items: center;
+  padding: 8px; border-radius: 999px; background: var(--glass); border: 1px solid var(--line); backdrop-filter: blur(8px); }
+.om-ask input { flex: 1; min-width: 0; background: transparent; border: 0; outline: 0; color: var(--fg); font: inherit; font-size: 17px; padding: 8px 6px; }
+.om-ask input::placeholder { color: var(--dim); }
+.om-btn { display: inline-grid; place-items: center; min-width: 42px; height: 42px; border-radius: 999px; border: 1px solid var(--line); background: rgba(77, 163, 255, .1);
+  color: var(--fg); cursor: pointer; font-size: 18px; text-decoration: none; }
+.om-btn:hover { border-color: var(--blue); }
+.om-btn.on { background: rgba(51, 225, 154, .22); border-color: var(--green); box-shadow: 0 0 16px rgba(51, 225, 154, .45); }
+.om-send { background: rgba(77, 163, 255, .25); }
+.om-wide { padding: 0 22px; margin-top: 18px; }
+
+.om-self { position: absolute; left: 16px; bottom: 92px; width: 180px; border-radius: 14px; border: 1px solid var(--green); transform: scaleX(-1); box-shadow: 0 0 22px rgba(51, 225, 154, .35); }
+
+.om-notice { display: grid; place-items: center; text-align: center; padding: 24px; }
+.om-notice h1 { font: 700 40px/1 Poppins, Inter, sans-serif; letter-spacing: .4em; color: var(--blue); margin: 0 0 18px; text-shadow: 0 0 22px rgba(77, 163, 255, .6); }
+.om-notice h2 { font-weight: 600; margin: 0 0 8px; }
+.om-notice p { color: var(--dim); max-width: 520px; margin: 0 auto; }
+
+@media (max-width: 760px) {
+  .om-log { display: none; }
+  .om-sub { bottom: 170px; }
+  .om-said { font-size: 18px; }
+  .om-sug { bottom: 84px; }
+  .om-self { width: 110px; bottom: 140px; }
+  .om-ask { gap: 4px; }
+  .om-btn { min-width: 38px; height: 38px; }
+  #om-mute, #om-clear { display: none; }
+}
