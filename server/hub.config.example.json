@@ -64,6 +64,6 @@
   ],
   "recordings": {"dir": "/home/usuario/securityCam"},
   "driveSync": {"enabled": false, "remote": "GDrive:CameraSeguranca", "hour": 3, "maxFileMB": 1024},
-  "dbPath": "centraldiogo.db",
+  "dbPath": "dvr.db",
   "allowedOrigins": []
 }

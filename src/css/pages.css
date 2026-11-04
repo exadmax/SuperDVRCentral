@@ -277,6 +277,7 @@ a { color: inherit; }
 .cfg-root[data-show="menu"] [data-tab]:not([data-tab="menu"]),
 .cfg-root[data-show="livros"] [data-tab]:not([data-tab="livros"]),
 .cfg-root[data-show="integracoes"] [data-tab]:not([data-tab="integracoes"]),
+.cfg-root[data-show="ia"] [data-tab]:not([data-tab="ia"]),
 .cfg-root[data-show="idioma"] [data-tab]:not([data-tab="idioma"]),
 .cfg-root[data-show="compat"] [data-tab]:not([data-tab="compat"]),
 .cfg-root[data-show="ajuda"] [data-tab]:not([data-tab="ajuda"]) { display: none; }

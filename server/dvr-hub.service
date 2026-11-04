@@ -1,12 +1,12 @@
 [Unit]
-Description=Central Diogo hub (painel + API)
+Description=DVR hub (painel + API)
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 User=__USER__
-WorkingDirectory=/opt/centraldiogo
-ExecStart=/opt/centraldiogo/hub -config /opt/centraldiogo/hub.config.json
+WorkingDirectory=/opt/dvr
+ExecStart=/opt/dvr/hub -config /opt/dvr/hub.config.json
 # porta 80 sem rodar como root
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE

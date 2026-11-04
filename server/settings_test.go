@@ -2,12 +2,15 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"dvr/hub/ai"
 )
 
 func testSettings(t *testing.T) (*settingsMgr, *http.ServeMux, string) {
@@ -249,7 +252,7 @@ func TestSettingsBooks(t *testing.T) {
 		t.Fatalf("salvar listas: %d %s", w.Code, w.Body)
 	}
 	for _, bad := range []string{
-		`{"books":{"enabled":true,"categories":["A","a"],"owners":[]}}`,                 // repetida
+		`{"books":{"enabled":true,"categories":["A","a"],"owners":[]}}`,                           // repetida
 		`{"books":{"enabled":true,"categories":[],"owners":["` + strings.Repeat("x", 41) + `"]}}`, // longa demais
 	} {
 		if w := put(mux, "/api/settings/panel", bad); w.Code != 400 {
@@ -258,5 +261,44 @@ func TestSettingsBooks(t *testing.T) {
 	}
 	if w := put(mux, "/api/settings/panel", `{"books":{"enabled":false,"categories":[],"owners":[]}}`); w.Code != 200 || m.booksEnabled() {
 		t.Fatalf("desligar: %d enabled=%v", w.Code, m.booksEnabled())
+	}
+}
+
+func TestSettingsAI(t *testing.T) {
+	m, mux, _ := testSettings(t)
+	get := func() map[string]interface{} {
+		w := httptest.NewRecorder()
+		mux.ServeHTTP(w, httptest.NewRequest("GET", "/api/settings/ai", nil))
+		var v map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &v)
+		return v
+	}
+	if v := get(); v["provider"] != "ollama" || v["ollamaURL"] != ai.DefaultOllamaURL || v["groqKeySet"] != false {
+		t.Fatalf("padrões: %v", v)
+	}
+	if w := put(mux, "/api/settings/ai", `{"provider":"groq","groqModel":"openai/gpt-oss-20b"}`); w.Code != 400 {
+		t.Fatalf("groq sem chave deveria falhar: %d", w.Code)
+	}
+	if w := put(mux, "/api/settings/ai", `{"provider":"ollama","ollamaURL":"ftp://x"}`); w.Code != 400 {
+		t.Fatalf("URL inválida deveria falhar: %d", w.Code)
+	}
+	w := put(mux, "/api/settings/ai", `{"provider":"groq","model":"qwen3:4b","groqKey":"gsk_SEGREDO"}`)
+	if w.Code != 200 || strings.Contains(w.Body.String(), "SEGREDO") {
+		t.Fatalf("gravar: %d %s", w.Code, w.Body.String())
+	}
+	if v := get(); v["groqKeySet"] != true || v["model"] != "qwen3:4b" || strings.Contains(fmt.Sprint(v), "SEGREDO") {
+		t.Fatalf("leitura não pode trazer a chave: %v", v)
+	}
+	// reenviar sem a chave mantém a atual
+	if w := put(mux, "/api/settings/ai", `{"provider":"groq","model":"qwen3:8b"}`); w.Code != 200 || m.aiConfig().GroqKey != "gsk_SEGREDO" {
+		t.Fatalf("manter chave: %d", w.Code)
+	}
+	if w := put(mux, "/api/settings/ai", `{"provider":"off","model":"qwen3:8b","clearGroqKey":true}`); w.Code != 200 || m.aiConfig().GroqKey != "" || m.st.AI.Provider != "off" {
+		t.Fatalf("apagar chave: %d", w.Code)
+	}
+	var cfg Config
+	m.st.applyTo(&cfg)
+	if cfg.AI.Provider != "off" || cfg.AI.Model != "qwen3:8b" {
+		t.Fatalf("applyTo: %+v", cfg.AI)
 	}
 }

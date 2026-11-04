@@ -39,7 +39,7 @@
       <p>Muestran el uso de CPU y memoria del propio hub y de toda la máquina, actualizados cada 5 segundos. Si la memoria de la máquina está casi llena, el panel puede ir lento: use “Liberar memoria”.</p>
       <h3>Liberar memoria</h3>
       <ul><li><b>Apagar el escritorio</b>: detiene el entorno gráfico del servidor (pantalla, navegador, audio del escritorio). No afecta al hub, al panel ni a las cámaras. Vuelve solo en el próximo reinicio de la máquina.</li>
-        <li><b>Desactivar la central</b>: detiene el hub. El panel, las cámaras y la agenda se quedan sin servicio hasta que alguien ejecute en el servidor <code>sudo systemctl start centraldiogo-hub</code>.</li></ul>
+        <li><b>Desactivar la central</b>: detiene el hub. El panel, las cámaras y la agenda se quedan sin servicio hasta que alguien ejecute en el servidor <code>sudo systemctl start dvr-hub</code>.</li></ul>
       <p>Los dos botones piden <b>dos toques</b>: el primero arma el botón (“¿Confirmar?”, durante 5 segundos) y el segundo lo ejecuta. Solo funcionan en el servidor Linux, con la regla de polkit instalada por <code>install.sh</code>.</p>` },
 
     { id: 'cameras', title: 'Cámaras: alta', html: `
@@ -208,7 +208,7 @@
         <li>Los nombres de fábrica (Juegos, Nevera, Cámaras…) se traducen al idioma en uso; un nombre que usted escribió se muestra tal cual.</li></ul>` },
 
     { id: 'integracoes', title: 'Integraciones', html: `
-      <p>Opciones del propio hub. <b>Todas solo valen después de reiniciar el hub</b>: tras guardar, aparece la franja amarilla con el botón <b>Reiniciar el hub ahora</b> (el panel y las cámaras quedan sin servicio unos segundos). Si el botón no aparece, reinicie en el servidor: <code>sudo systemctl restart centraldiogo-hub</code>.</p>
+      <p>Opciones del propio hub. <b>Todas solo valen después de reiniciar el hub</b>: tras guardar, aparece la franja amarilla con el botón <b>Reiniciar el hub ahora</b> (el panel y las cámaras quedan sin servicio unos segundos). Si el botón no aparece, reinicie en el servidor: <code>sudo systemctl restart dvr-hub</code>.</p>
       <h3>Hoja de cálculo de profesionales</h3>
       <p>La página Servicios (profesionales: electricista, fontanero…) puede alimentarse desde una hoja de cálculo de Google.</p>
       <ol><li>En la hoja, deje una pestaña con los encabezados de abajo y <b>publíquela en la web</b> (Archivo &rarr; Compartir &rarr; Publicar en la web) o use el formato <code>https://docs.google.com/spreadsheets/d/ID/gviz/tq?tqx=out:csv&amp;sheet=NOMBRE_DE_LA_PESTAÑA</code>.</li>
@@ -229,6 +229,16 @@
         <li><b>Agendas: conservar durante</b>: minutos que el hub reutiliza la agenda antes de leer Google otra vez (por defecto 5).</li>
         <li><b>Tráfico: consultar como máximo cada</b>: intervalo mínimo entre consultas a la API (por defecto 10). Auméntelo para gastar menos cuota.</li>
         <li><b>Usar solo IPv4</b>: necesario si la clave de Google tiene restricción de IP.</li></ul>` },
+
+    { id: 'ia', title: 'IA (asistente)', html: `
+      <p>Configura la inteligencia artificial que usa la interfaz PC (el asistente Jarvis). Todo funciona en el servidor: nada de la IA se instala en la TV ni en el móvil.</p>
+      <h3>GPU del servidor</h3>
+      <p>Muestra la tarjeta de vídeo detectada y cuánta memoria queda para un modelo. Una GPU integrada (Intel Iris Xe, por ejemplo) no tiene memoria propia: usa la RAM del ordenador, por eso solo cuenta la mitad de la memoria compartida. Los <b>modelos sugeridos</b> caben en esa memoria; un modelo mayor funciona, pero lento.</p>
+      <h3>Proveedor</h3>
+      <ul><li><b>Ollama (local)</b>: el predeterminado. Instale Ollama en el servidor (<code>winget install Ollama.Ollama</code> en Windows, o ollama.com/download) y descargue un modelo sugerido con <code>ollama pull &lt;modelo&gt;</code>. Nada sale de su casa.</li>
+      <li><b>Groq (internet)</b>: más rápido y con modelos mayores, pero el texto va a Groq. Requiere la clave (console.groq.com/keys), que queda solo en el servidor.</li>
+      <li><b>Desactivado</b>: la interfaz PC funciona sin el chat.</li></ul>
+      <p><b>Probar conexión</b> muestra la versión de Ollama y los modelos instalados, marcando los que caben en la GPU. En GPU Intel o AMD, Ollama usa Vulkan; si el modelo va lento, compruebe en el servidor con <code>ollama ps</code> si se cargó en la GPU.</p>` },
 
     { id: 'idioma', title: 'Idioma', html: `
       <p>La interfaz (pantalla de inicio, Nevera y Despensa, Servicios, Cámaras, Vídeos y la propia Config, incluida esta Ayuda) existe en <b>cuatro idiomas</b>: Português, English, Español y 中文 (chino simplificado).</p>

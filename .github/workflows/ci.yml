@@ -1,0 +1,52 @@
+name: CI
+
+# Cada pull request e cada push na main: formatação, vet e testes do hub em Linux e Windows, e as traduções do painel.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  hub:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: server
+    env:
+      CGO_ENABLED: '0'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
+
+      - name: Formatação (gofmt)
+        run: |
+          f="$(gofmt -l .)"
+          if [ -n "$f" ]; then echo "::error::arquivos sem gofmt:"; echo "$f"; exit 1; fi
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Testes
+        run: go test ./...
+
+  i18n:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Traduções
+        run: node scripts/check-i18n.js

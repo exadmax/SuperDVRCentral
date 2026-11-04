@@ -13,20 +13,20 @@ Pré-lançamentos usam sufixo: `v1.1.0-rc.1`, `v1.1.0-beta.1`. O GitHub os marca
 ## Regras
 - A tag sai **sempre da `main`**, com `go vet`, `go test` e `node scripts/check-i18n.js` passando.
 - A tag é **imutável**. Se errou, publique o próximo PATCH; não mova nem apague tag já publicada.
-- Use tag **anotada**: `git tag -a v1.0.0 -m "Central Diogo 1.0.0"`.
+- Use tag **anotada**: `git tag -a v1.0.0 -m "DVR 1.0.0"`.
 - Uma release por tag. As notas separam *Novidades*, *Correções* e *Atenção ao atualizar* (mudanças que pedem ação manual).
 
 ## Como publicar
 ```bash
 git switch main && git pull
-git tag -a v1.0.0 -m "Central Diogo 1.0.0"
+git tag -a v1.0.0 -m "DVR 1.0.0"
 git push origin v1.0.0
 ```
 O workflow `.github/workflows/release.yml` confere que a tag está na `main`, roda os testes, compila os 4 binários Linux,
-monta o `centraldiogo.tgz` (Linux) e o `centraldiogo-windows.zip` (instalador em janela), gera o `SHA256SUMS` e cria a release com as notas geradas pelo GitHub.
+monta o `dvr.tgz` (Linux) e o `dvr-windows.zip` (instalador em janela), gera o `SHA256SUMS` e cria a release com as notas geradas pelo GitHub.
 
 ## Versão instalada no servidor
-- **Pacote de release** (`./package.sh vX.Y.Z`): leva um arquivo `RELEASE`, e o `install.sh` grava essa versão em `/opt/centraldiogo/VERSION`.
+- **Pacote de release** (`./package.sh vX.Y.Z`): leva um arquivo `RELEASE`, e o `install.sh` grava essa versão em `/opt/dvr/VERSION`.
   A versão do servidor passa a ser a da tag.
 - **Pacote montado do código** (`./package.sh`, sem tag): não tem `RELEASE`, e cada instalação concluída soma 1 ao PATCH, como antes.
 - Cada instalação, de qualquer tipo, continua registrando a linha `V<antiga> -> V<nova>` em `install.log`.

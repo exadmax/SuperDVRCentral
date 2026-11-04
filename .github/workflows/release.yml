@@ -39,7 +39,7 @@ jobs:
       - name: Reunir arquivos e checksums
         run: |
           mkdir out
-          cp server/dist/centraldiogo.tgz server/dist/centraldiogo-windows.zip server/dist/hub-linux-* out/
+          cp server/dist/dvr.tgz server/dist/dvr-windows.zip server/dist/hub-linux-* out/
           cd out && sha256sum * > SHA256SUMS && cat SHA256SUMS
 
       - name: Criar a release
@@ -48,4 +48,4 @@ jobs:
         run: |
           PRE=""
           case "$GITHUB_REF_NAME" in *-*) PRE="--prerelease";; esac
-          gh release create "$GITHUB_REF_NAME" out/* --title "Central Diogo ${GITHUB_REF_NAME#v}" --generate-notes $PRE
+          gh release create "$GITHUB_REF_NAME" out/* --title "DVR ${GITHUB_REF_NAME#v}" --generate-notes $PRE

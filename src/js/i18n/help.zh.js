@@ -39,7 +39,7 @@
       <p>显示 hub 自身和整台主机的 CPU 与内存使用情况，每 5 秒更新一次。如果主机内存快满了，面板可能会变慢：请使用“释放内存”。</p>
       <h3>释放内存</h3>
       <ul><li><b>关闭桌面</b>：停止服务器的图形界面（屏幕、浏览器、桌面音频）。不影响 hub、面板和摄像头。下次主机重启时会自动恢复。</li>
-        <li><b>停用中心</b>：停止 hub。面板、摄像头和日历会下线，直到有人在服务器上运行 <code>sudo systemctl start centraldiogo-hub</code>。</li></ul>
+        <li><b>停用中心</b>：停止 hub。面板、摄像头和日历会下线，直到有人在服务器上运行 <code>sudo systemctl start dvr-hub</code>。</li></ul>
       <p>这两个按钮都需要<b>点两次</b>：第一次使按钮进入待确认状态（“确认？”，持续 5 秒），第二次才会执行。它们只能在 Linux 服务器上使用，并需要 <code>install.sh</code> 安装的 polkit 规则。</p>` },
 
     { id: 'cameras', title: '摄像头：登记', html: `
@@ -208,7 +208,7 @@
         <li>出厂默认名称（游戏、冰箱、摄像头…）会翻译成当前使用的语言；您自己输入的名称会原样显示。</li></ul>` },
 
     { id: 'integracoes', title: '集成', html: `
-      <p>hub 自身的选项。<b>所有这些都要重启 hub 后才生效</b>：保存后会出现黄色提示条，带有<b>立即重启 hub</b>按钮（面板和摄像头会离线几秒钟）。如果没有出现这个按钮，请在服务器上重启：<code>sudo systemctl restart centraldiogo-hub</code>。</p>
+      <p>hub 自身的选项。<b>所有这些都要重启 hub 后才生效</b>：保存后会出现黄色提示条，带有<b>立即重启 hub</b>按钮（面板和摄像头会离线几秒钟）。如果没有出现这个按钮，请在服务器上重启：<code>sudo systemctl restart dvr-hub</code>。</p>
       <h3>服务商表格</h3>
       <p>“服务”页面（服务商：电工、水管工…）可以由 Google 表格提供数据。</p>
       <ol><li>在表格中保留一个带有下列表头的工作表，并<b>发布到网络</b>（文件 &rarr; 共享 &rarr; 发布到网络），或使用格式 <code>https://docs.google.com/spreadsheets/d/ID/gviz/tq?tqx=out:csv&amp;sheet=工作表名称</code>。</li>
@@ -229,6 +229,16 @@
         <li><b>日历：缓存时间</b>：hub 在再次读取 Google 之前复用日历的分钟数（默认 5）。</li>
         <li><b>路况：最短查询间隔</b>：两次 API 查询之间的最短间隔（默认 10）。调大可以少用额度。</li>
         <li><b>仅使用 IPv4</b>：如果 Google 密钥限制了 IP，则必须开启。</li></ul>` },
+
+    { id: 'ia', title: 'AI（助手）', html: `
+      <p>设置 PC 界面（Jarvis 助手）使用的人工智能。一切都在服务器上运行：电视和手机上不安装任何 AI 组件。</p>
+      <h3>服务器 GPU</h3>
+      <p>显示检测到的显卡以及可供模型使用的显存。集成显卡（例如 Intel Iris Xe）没有独立显存，使用电脑内存，因此只计算共享显存的一半。<b>推荐模型</b>能放进这部分显存；更大的模型也能运行，但会很慢。</p>
+      <h3>提供方</h3>
+      <ul><li><b>Ollama（本地）</b>：默认选项。在服务器上安装 Ollama（Windows 上运行 <code>winget install Ollama.Ollama</code>，或访问 ollama.com/download），然后用 <code>ollama pull &lt;模型&gt;</code> 下载推荐模型。数据不会离开您家。</li>
+      <li><b>Groq（联网）</b>：更快、模型更大，但文本会发送到 Groq。需要密钥（console.groq.com/keys），密钥只保存在服务器上。</li>
+      <li><b>关闭</b>：PC 界面可以在没有聊天的情况下使用。</li></ul>
+      <p><b>测试连接</b>会显示 Ollama 版本和已安装的模型，并标出适合 GPU 的模型。在 Intel 或 AMD 显卡上 Ollama 使用 Vulkan；如果模型很慢，请在服务器上用 <code>ollama ps</code> 确认它是否加载到了 GPU。</p>` },
 
     { id: 'idioma', title: '语言', html: `
       <p>界面（主屏幕、冰箱与储藏室、服务、摄像头、视频以及“设置”本身，包括这份帮助）提供<b>四种语言</b>：Português、English、Español 和 中文（简体中文）。</p>

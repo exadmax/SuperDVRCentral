@@ -1,7 +1,7 @@
 // Botões do painel para aliviar a máquina: desligar o desktop (display manager) e desativar o próprio hub.
 // Só no Linux com systemd. O hub roda sem root, então a permissão vem de uma regra do polkit que o install.sh grava
 // (somente "stop" dessas unidades, somente para o usuário do serviço). Nada é desativado no boot: o desktop volta no
-// próximo reinício e o hub volta com "sudo systemctl start centraldiogo-hub".
+// próximo reinício e o hub volta com "sudo systemctl start dvr-hub".
 package main
 
 import (

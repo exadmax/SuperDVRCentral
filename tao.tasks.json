@@ -4,8 +4,15 @@
       "id": "S1",
       "title": "M0 — Fundação do DVR",
       "goal": "Nome DVR, limpeza do banco, bloco ai com GPU e catálogo de modelos, aba IA da Config, CI",
-      "status": "planned",
-      "created": "2026-11-03T21:00:00-03:00"
+      "status": "closed",
+      "created": "2026-11-03T21:00:00-03:00",
+      "started": "2026-11-04T09:00:00-03:00",
+      "closed": "2026-11-04T12:00:00-03:00",
+      "retro": [
+        "Renomeação em lote é mais barata feita de uma vez do que em 4 tarefas separadas.",
+        "Contrato de JSON definido antes de paralelizar evitou retrabalho entre servidor e tela.",
+        "Testar a tela no navegador achou um bug (formulário lido depois de redesenhar) que os testes de Go não pegariam."
+      ]
     },
     {
       "id": "S2",
@@ -71,11 +78,21 @@
       "done": "Arquivos: server/go.mod (module dvr/hub), server/*.go (textos, unidade systemd em power.go e main.go), server/centraldiogo-hub.service renomeado para dvr-hub.service, server/hub.config.example.json (dbPath dvr.db). Pronto quando: grep -ri \"centraldiogo\\|central diogo\" server --include=*.go --include=go.mod --include=*.service --include=*.json não acha nada. Conferir: cd server && gofmt -l . && go vet ./... && go test ./... limpos.",
       "assignee": "eng-go",
       "sprint": "S1",
-      "status": "ready",
+      "status": "done",
       "priority": "high",
       "origin": "plan",
       "created": "2026-11-03T21:00:00-03:00",
-      "updated": "2026-11-03T21:00:00-03:00"
+      "updated": "2026-11-04T12:00:00-03:00",
+      "approved": true,
+      "summary": "Módulo dvr/hub, serviço dvr-hub.service, dvr.db e textos do hub renomeados; gofmt aplicado nos arquivos herdados.",
+      "branch": "sprint/s1-m0",
+      "history": [
+        {
+          "at": "2026-11-04T12:00:00-03:00",
+          "by": "claude-code",
+          "what": "Feito fora do TAO (sessão do Claude Code com subagente), na branch sprint/s1-m0; verificado com gofmt, go vet, go test (Windows e Linux) e check-i18n."
+        }
+      ]
     },
     {
       "id": "T002",
@@ -83,11 +100,21 @@
       "done": "Arquivos: server/install.sh (/opt/dvr, serviço dvr-hub), server/package.sh e build.sh (dist/dvr.tgz, dvr-windows.zip), server/windows/install.ps1, Instalar.cmd e LEIA-ME.txt (%ProgramData%\\DVR, %LocalAppData%\\DVR, tarefa e registro com nome DVR), .github/workflows/release.yml. Pronto quando: grep -ri \"centraldiogo\\|central diogo\" nesses arquivos vazio; bash -n install.sh package.sh build.sh OK; o .ps1 passa em [System.Management.Automation.Language.Parser]::ParseFile sem erros.",
       "assignee": "eng-go",
       "sprint": "S1",
-      "status": "ready",
+      "status": "done",
       "priority": "high",
       "origin": "plan",
       "created": "2026-11-03T21:00:00-03:00",
-      "updated": "2026-11-03T21:00:00-03:00"
+      "updated": "2026-11-04T12:00:00-03:00",
+      "approved": true,
+      "summary": "install.sh (/opt/dvr), package.sh (dvr.tgz, dvr-windows.zip), instalador Windows (%ProgramData%\\DVR, tarefa DVRHub) e release.yml renomeados.",
+      "branch": "sprint/s1-m0",
+      "history": [
+        {
+          "at": "2026-11-04T12:00:00-03:00",
+          "by": "claude-code",
+          "what": "Feito fora do TAO (sessão do Claude Code com subagente), na branch sprint/s1-m0; verificado com gofmt, go vet, go test (Windows e Linux) e check-i18n."
+        }
+      ]
     },
     {
       "id": "T003",
@@ -95,11 +122,21 @@
       "done": "Arquivos: src/*.html (títulos), src/css/main.css, src/js/pages/boot.js, src/js/i18n/{pt,en,es,zh}.js e help.{pt,en,es,zh}.js. Trocar só o nome do produto (\"Central Diogo\"/\"Omega Diogo\" → \"DVR\"). Pronto quando: grep -ri \"central diogo\\|centraldiogo\\|omega diogo\" src vazio; node scripts/check-i18n.js OK.",
       "assignee": "junior",
       "sprint": "S1",
-      "status": "ready",
+      "status": "done",
       "priority": "normal",
       "origin": "plan",
       "created": "2026-11-03T21:00:00-03:00",
-      "updated": "2026-11-03T21:00:00-03:00"
+      "updated": "2026-11-04T12:00:00-03:00",
+      "approved": true,
+      "summary": "Interface TV e traduções (incluindo a ajuda) com o nome DVR.",
+      "branch": "sprint/s1-m0",
+      "history": [
+        {
+          "at": "2026-11-04T12:00:00-03:00",
+          "by": "claude-code",
+          "what": "Feito fora do TAO (sessão do Claude Code com subagente), na branch sprint/s1-m0; verificado com gofmt, go vet, go test (Windows e Linux) e check-i18n."
+        }
+      ]
     },
     {
       "id": "T004",
@@ -107,11 +144,21 @@
       "done": "Arquivos: README.md, SECURITY.md, docs/*.md (não mexer em docs/design/, docs/img/ nem docs/superdvr/). Trocar nome do produto, serviço (dvr-hub), pasta (/opt/dvr), banco (dvr.db) e links do GitHub para exadmax/SuperDVRCentral. Pronto quando: grep -ri \"centraldiogo\\|central diogo\" README.md SECURITY.md docs/*.md vazio.",
       "assignee": "junior",
       "sprint": "S1",
-      "status": "ready",
+      "status": "done",
       "priority": "normal",
       "origin": "plan",
       "created": "2026-11-03T21:00:00-03:00",
-      "updated": "2026-11-03T21:00:00-03:00"
+      "updated": "2026-11-04T12:00:00-03:00",
+      "approved": true,
+      "summary": "README, SECURITY e docs/*.md com o nome DVR.",
+      "branch": "sprint/s1-m0",
+      "history": [
+        {
+          "at": "2026-11-04T12:00:00-03:00",
+          "by": "claude-code",
+          "what": "Feito fora do TAO (sessão do Claude Code com subagente), na branch sprint/s1-m0; verificado com gofmt, go vet, go test (Windows e Linux) e check-i18n."
+        }
+      ]
     },
     {
       "id": "T005",
@@ -120,11 +167,21 @@
       "assignee": "eng-go",
       "reviewer": "arquiteto",
       "sprint": "S1",
-      "status": "ready",
+      "status": "done",
       "priority": "normal",
       "origin": "plan",
       "created": "2026-11-03T21:00:00-03:00",
-      "updated": "2026-11-03T21:00:00-03:00"
+      "updated": "2026-11-04T12:00:00-03:00",
+      "approved": true,
+      "summary": "Migração 5 apaga as tabelas desk_*; banco do DVRCentral (user_version 11) volta para a base comum 4; banco mais novo que o hub é recusado. Testes novos.",
+      "branch": "sprint/s1-m0",
+      "history": [
+        {
+          "at": "2026-11-04T12:00:00-03:00",
+          "by": "claude-code",
+          "what": "Feito fora do TAO (sessão do Claude Code com subagente), na branch sprint/s1-m0; verificado com gofmt, go vet, go test (Windows e Linux) e check-i18n."
+        }
+      ]
     },
     {
       "id": "T006",
@@ -132,11 +189,21 @@
       "done": "Arquivos: server/main.go e server/settings.go (+ testes). Campos: provider (ollama|groq|off, padrão ollama), ollamaURL (padrão http://127.0.0.1:11434), model, groqKey (só no servidor, sai mascarada da API como os outros segredos), groqModel. Editável pela Config como as demais seções. Pronto quando: GET das configurações devolve o bloco com a chave mascarada; POST com a máscara não apaga a chave salva; testes cobrem isso. Conferir: cd server && gofmt -l . && go vet ./... && go test ./... limpos.",
       "assignee": "eng-go",
       "sprint": "S1",
-      "status": "ready",
+      "status": "done",
       "priority": "normal",
       "origin": "plan",
       "created": "2026-11-03T21:00:00-03:00",
-      "updated": "2026-11-03T21:00:00-03:00"
+      "updated": "2026-11-04T12:00:00-03:00",
+      "approved": true,
+      "summary": "ai.Config no hub.config.json e na Config (GET/PUT /api/settings/ai), chave da Groq mascarada e mantida quando vazia.",
+      "branch": "sprint/s1-m0",
+      "history": [
+        {
+          "at": "2026-11-04T12:00:00-03:00",
+          "by": "claude-code",
+          "what": "Feito fora do TAO (sessão do Claude Code com subagente), na branch sprint/s1-m0; verificado com gofmt, go vet, go test (Windows e Linux) e check-i18n."
+        }
+      ]
     },
     {
       "id": "T007",
@@ -145,11 +212,21 @@
       "assignee": "eng-go",
       "reviewer": "arquiteto",
       "sprint": "S1",
-      "status": "ready",
+      "status": "done",
       "priority": "high",
       "origin": "plan",
       "created": "2026-11-03T21:00:00-03:00",
-      "updated": "2026-11-03T21:00:00-03:00"
+      "updated": "2026-11-04T12:00:00-03:00",
+      "approved": true,
+      "summary": "server/ai: detecção de GPU (Windows/Linux/nvidia-smi, integrada = RAM/2), catálogo por memória efetiva, GET /api/ai/hardware. Iris Xe de teste: 6074 MB efetivos, qwen3:4b.",
+      "branch": "sprint/s1-m0",
+      "history": [
+        {
+          "at": "2026-11-04T12:00:00-03:00",
+          "by": "claude-code",
+          "what": "Feito fora do TAO (sessão do Claude Code com subagente), na branch sprint/s1-m0; verificado com gofmt, go vet, go test (Windows e Linux) e check-i18n."
+        }
+      ]
     },
     {
       "id": "T008",
@@ -157,11 +234,21 @@
       "done": "Arquivo: server/ai/status.go (+ teste com httptest). GET /api/ai/status: provedor ativo, Ollama alcançável (GET /api/version e /api/tags), versão, modelos instalados marcados como cabe/não cabe na GPU (catálogo da tarefa anterior), mensagem clara quando o Ollama não está instalado. Pronto quando: testes cobrem Ollama no ar, fora do ar e Groq configurado sem fazer chamada real. Conferir: cd server && gofmt -l . && go vet ./... && go test ./... limpos.",
       "assignee": "eng-go",
       "sprint": "S1",
-      "status": "ready",
+      "status": "done",
       "priority": "normal",
       "origin": "plan",
       "created": "2026-11-03T21:00:00-03:00",
-      "updated": "2026-11-03T21:00:00-03:00"
+      "updated": "2026-11-04T12:00:00-03:00",
+      "approved": true,
+      "summary": "GET /api/ai/status: Ollama (versão, modelos, cabe/não cabe), Groq sem chamada de rede, off. Testado contra o Ollama 0.40.14 local.",
+      "branch": "sprint/s1-m0",
+      "history": [
+        {
+          "at": "2026-11-04T12:00:00-03:00",
+          "by": "claude-code",
+          "what": "Feito fora do TAO (sessão do Claude Code com subagente), na branch sprint/s1-m0; verificado com gofmt, go vet, go test (Windows e Linux) e check-i18n."
+        }
+      ]
     },
     {
       "id": "T009",
@@ -169,11 +256,21 @@
       "done": "Arquivos: src/js/pages/configPanel.js (ou o módulo de abas atual), src/js/services/hubApi.js, src/js/i18n/*.js e help.*.js. Mostrar GPU, memória de vídeo (dedicada/compartilhada), modelos sugeridos, provedor, URL do Ollama, modelo, chave da Groq (campo mascarado), botão Testar conexão (/api/ai/status) e como instalar o Ollama se faltar. Pronto quando: a aba funciona com o hub em go run (Ollama ausente mostra o aviso); node scripts/check-i18n.js OK.",
       "assignee": "eng-front",
       "sprint": "S1",
-      "status": "ready",
+      "status": "done",
       "priority": "normal",
       "origin": "plan",
       "created": "2026-11-03T21:00:00-03:00",
-      "updated": "2026-11-03T21:00:00-03:00"
+      "updated": "2026-11-04T12:00:00-03:00",
+      "approved": true,
+      "summary": "Aba IA da Config (configAI.js) em 4 idiomas, com ajuda; testada no navegador (salvar, Groq sem chave recusado, Ollama fora do ar).",
+      "branch": "sprint/s1-m0",
+      "history": [
+        {
+          "at": "2026-11-04T12:00:00-03:00",
+          "by": "claude-code",
+          "what": "Feito fora do TAO (sessão do Claude Code com subagente), na branch sprint/s1-m0; verificado com gofmt, go vet, go test (Windows e Linux) e check-i18n."
+        }
+      ]
     },
     {
       "id": "T010",
@@ -181,11 +278,21 @@
       "done": "Criar .github/workflows/ci.yml: em pull_request e push na main, jobs ubuntu-latest e windows-latest com Go da versão de server/go.mod: gofmt -l (falha se listar algo), go vet ./..., go test ./... em server/; e node scripts/check-i18n.js. Pronto quando: o YAML é válido (actionlint ou revisão) e os comandos rodam localmente.",
       "assignee": "junior",
       "sprint": "S1",
-      "status": "ready",
+      "status": "done",
       "priority": "normal",
       "origin": "plan",
       "created": "2026-11-03T21:00:00-03:00",
-      "updated": "2026-11-03T21:00:00-03:00"
+      "updated": "2026-11-04T12:00:00-03:00",
+      "approved": true,
+      "summary": ".github/workflows/ci.yml (gofmt, vet, testes em Linux e Windows; traduções); .gitattributes força LF nos .go.",
+      "branch": "sprint/s1-m0",
+      "history": [
+        {
+          "at": "2026-11-04T12:00:00-03:00",
+          "by": "claude-code",
+          "what": "Feito fora do TAO (sessão do Claude Code com subagente), na branch sprint/s1-m0; verificado com gofmt, go vet, go test (Windows e Linux) e check-i18n."
+        }
+      ]
     },
     {
       "id": "T011",

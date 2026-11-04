@@ -1,4 +1,4 @@
-/* Central Diogo — tema escuro, painel para TV 1920x1080 (escalado) e coluna única no celular.
+/* DVR — tema escuro, painel para TV 1920x1080 (escalado) e coluna única no celular.
    Baseado no design em docs/design. Evita recursos novos (color-mix, ?., etc.) por causa das TVs Tizen. */
 
 @font-face { font-family: 'Inter'; font-weight: 400 700; font-display: swap; src: url(../assets/fonts/inter-latin.woff2) format('woff2'); }

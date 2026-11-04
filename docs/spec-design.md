@@ -1,4 +1,4 @@
-﻿# Central Diogo — Especificação de design
+﻿# DVR — Especificação de design
 
 ## Contexto
 Painel de informações da casa, exibido no navegador da **TV (1920×1080), uso doméstico**, lido a 2–3 metros de distância ("10-foot UI"). Celular e tablet usam o mesmo painel web, responsivo a partir do mesmo layout.
@@ -7,7 +7,7 @@ Não é interativo no dia a dia: fica ligado como painel passivo. Controle remot
 ## Princípios
 - Legível de longe: texto mínimo 28px, números principais 72–120px.
 - Uma olhada responde: "o que tenho hoje? vou levar guarda-chuva? quanto tempo até o trabalho? é feriado?"
-- Identidade visual baseada no logotipo **Omega Diogo** (arquivo do logo anexo): fundo azul-marinho quase preto, neon ciano e verde com degradê e leve glow. Nome do app: **Omega Diogo**.
+- Identidade visual baseada no logotipo **DVR** (arquivo do logo anexo): fundo azul-marinho quase preto, neon ciano e verde com degradê e leve glow. Nome do app: **DVR**.
 - Paleta (extraída do logo, ajustar por amostragem): fundo #0B1220, cartões #121B2D, texto #EAF6FF, ciano primário #00C8FF, verde secundário #3DFF7A, degradê de destaque ciano→verde (esquerda→direita, 135deg), alerta âmbar #FFB020, feriado/erro #FF6B6B.
 - Uso das cores: ciano para informação (hora, clima, títulos), verde para "ok/livre/bom" (trânsito fluindo, sem chuva), degradê ciano→verde em bordas de cartão, barras e no anel de destaque do próximo evento. Glow discreto (blur 12–20px, opacidade 30%) só em elementos de destaque, nunca no texto corrido.
 - Motivo gráfico: anel/arco em linhas finas duplas inspirado no ômega do logo, usado como moldura do relógio e como indicador de progresso (ex.: tempo até o próximo evento).

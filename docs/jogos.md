@@ -67,7 +67,7 @@ O refresh token vai para `games.state.json` e é renovado sozinho. Alternativa p
 `./hub -config hub.config.json -xbox-login`. Se preferir um app próprio do Azure, preencha `xbox.clientId`
 (cliente público com redirect `https://login.live.com/oauth20_desktop.srf`).
 
-Depois de editar o `hub.config.json`: `sudo systemctl restart centraldiogo-hub`.
+Depois de editar o `hub.config.json`: `sudo systemctl restart dvr-hub`.
 
 ## Limitações
 - Horas jogadas: só Steam e PS4/PS5 informam (Xbox e RetroAchievements não).

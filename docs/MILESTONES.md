@@ -10,7 +10,7 @@ Levantamento e motivos das decisões: [superdvr/levantamento-e-milestones.md](su
 |---|---|
 | Servidor | **Windows e Linux**. Máquina de teste: Windows 11, Intel Iris Xe (sem NVIDIA, 11,9 GB de memória de vídeo compartilhada), 23,7 GB de RAM |
 | Login | **Nenhum**, nas duas interfaces: é a interface da casa e precisa estar disponível na hora. Proteção = rede local (VPN para acesso de fora) |
-| Nome | `centraldiogo` / "Central Diogo" vira **`dvr`** / **"DVR"** (módulo, binário, serviço, pastas, banco, textos) |
+| Nome | `centraldiogo` / "Central Diogo" virou **`dvr`** / **"DVR"** (módulo, binário, serviço `dvr-hub`, pastas `/opt/dvr` e `%ProgramData%\DVR`, banco `dvr.db`, textos) — feito na S1 |
 | Banco | Começa novo; migração remove as tabelas `desk_*` que vierem de um banco do DVRCentral |
 | IA | Ollama local, com **opções de modelo conforme a memória de vídeo** detectada (tabela abaixo); Groq opcional; instalar o Ollama na máquina de teste só quando a M2 precisar |
 | Rosto | YuNet (detecção) + SFace (assinatura de 128 números) com ONNX Runtime; **conferir as versões oficiais antes de implementar** (tarefa T035) |
@@ -41,7 +41,7 @@ CUDA em NVIDIA, **DirectML ou OpenVINO** em Intel/AMD no Windows, CPU como reser
 | `revisor` | Gemini / medium | Revisão (o orquestrador escolhe sempre um cliente diferente de quem fez) |
 | `revisor-opencode` | OpenCode / medium | Revisão reserva |
 
-## M0 — Fundação do DVR (sprint S1)
+## M0 — Fundação do DVR (sprint S1) — feito
 Pronto quando: o hub sobe com o nome **DVR** (`dvr-hub`, `dvr.db`, `/opt/dvr`, `%ProgramData%\DVR`); um banco antigo perde as tabelas `desk_*`;
 a Config tem a aba **IA** com a GPU detectada, a memória de vídeo, os modelos sugeridos e o teste de conexão com o Ollama; o CI roda build,
 vet, testes (Windows e Linux) e traduções em cada PR.

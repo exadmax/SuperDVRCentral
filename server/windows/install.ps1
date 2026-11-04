@@ -1,5 +1,5 @@
-﻿# Instalador do Central Diogo para Windows, em janela (sem terminal). Abra pelo Instalar.cmd.
-# Pergunta como o Central Diogo será usado:
+﻿# Instalador do DVR para Windows, em janela (sem terminal). Abra pelo Instalar.cmd.
+# Pergunta como o DVR será usado:
 #   servidor : roda como tarefa do sistema, sobe com o Windows e atende a rede da casa (precisa de administrador; porta 80 ou 8080)
 #   pessoal  : roda na sua sessão, só neste PC (localhost:8080), sem abrir nada na rede
 # Banco, configuração e livros ficam na pasta de dados e são mantidos ao reinstalar ou atualizar.
@@ -19,10 +19,10 @@ Add-Type -AssemblyName System.Windows.Forms, System.Drawing
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
 $Aqui = $PSScriptRoot
-$Tarefa = 'CentralDiogoHub'
-$Regra = 'Central Diogo (hub)'
-$ChaveReg = 'Software\Microsoft\Windows\CurrentVersion\Uninstall\CentralDiogo'
-$Exe = 'centraldiogo-hub.exe'
+$Tarefa = 'DVRHub'
+$Regra = 'DVR (hub)'
+$ChaveReg = 'Software\Microsoft\Windows\CurrentVersion\Uninstall\DVR'
+$Exe = 'dvr-hub.exe'
 $VersaoRe = '^\d+\.\d+\.\d+(-[0-9A-Za-z.]+)?$'
 
 function Test-Admin {
@@ -31,13 +31,13 @@ function Test-Admin {
 
 function Get-Destino([string]$modo) {
   if ($Pasta) { return $Pasta }
-  if ($modo -eq 'servidor') { return (Join-Path $env:ProgramData 'CentralDiogo') }
-  return (Join-Path $env:LOCALAPPDATA 'CentralDiogo')
+  if ($modo -eq 'servidor') { return (Join-Path $env:ProgramData 'DVR') }
+  return (Join-Path $env:LOCALAPPDATA 'DVR')
 }
 
 function Get-Atalho([string]$modo) {
-  if ($modo -eq 'servidor') { return (Join-Path $env:ProgramData 'Microsoft\Windows\Start Menu\Programs\Central Diogo.url') }
-  return (Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs\Central Diogo.url')
+  if ($modo -eq 'servidor') { return (Join-Path $env:ProgramData 'Microsoft\Windows\Start Menu\Programs\DVR.url') }
+  return (Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs\DVR.url')
 }
 
 function Write-Texto([string]$caminho, [string]$texto, [bool]$bom = $false) {
@@ -99,7 +99,7 @@ function Install-Central([string]$modo, [scriptblock]$log) {
     if ($nova -notmatch $VersaoRe) { throw "Arquivo RELEASE inválido: '$nova'." }
   }
 
-  & $log 'Parando o Central Diogo, se estiver rodando...'
+  & $log 'Parando o DVR, se estiver rodando...'
   Stop-Hub $D
 
   & $log "Copiando arquivos para $D ..."
@@ -157,7 +157,7 @@ function Install-Central([string]$modo, [scriptblock]$log) {
       $gatilho = New-ScheduledTaskTrigger -AtLogOn -User $eu
       $princ = New-ScheduledTaskPrincipal -UserId $eu -LogonType Interactive -RunLevel Limited
     }
-    Register-ScheduledTask -TaskName $Tarefa -Action $acao -Trigger $gatilho -Principal $princ -Settings $conf -Description 'Central Diogo: painel da casa' -Force | Out-Null
+    Register-ScheduledTask -TaskName $Tarefa -Action $acao -Trigger $gatilho -Principal $princ -Settings $conf -Description 'DVR: painel da casa' -Force | Out-Null
 
     if ($modo -eq 'servidor') {
       & $log "Liberando a porta $porta no firewall (só redes privadas e de domínio) ..."
@@ -175,7 +175,7 @@ function Install-Central([string]$modo, [scriptblock]$log) {
     if ($modo -eq 'servidor') { $raiz = 'HKLM:' }
     $k = Join-Path $raiz $ChaveReg
     New-Item -Path $k -Force | Out-Null
-    Set-ItemProperty $k DisplayName 'Central Diogo'
+    Set-ItemProperty $k DisplayName 'DVR'
     Set-ItemProperty $k DisplayVersion $nova
     Set-ItemProperty $k Publisher 'Diogo'
     Set-ItemProperty $k InstallLocation $D
@@ -183,20 +183,20 @@ function Install-Central([string]$modo, [scriptblock]$log) {
     Set-ItemProperty $k NoModify 1 -Type DWord
     Set-ItemProperty $k NoRepair 1 -Type DWord
 
-    & $log 'Iniciando o Central Diogo ...'
+    & $log 'Iniciando o DVR ...'
     Start-ScheduledTask -TaskName $Tarefa
   }
 
   $url = "http://127.0.0.1:$porta/"
   if (-not $SemRegistro) {
-    & $log 'Aguardando o Central Diogo responder ...'
+    & $log 'Aguardando o DVR responder ...'
     $ok = $false
     for ($i = 0; $i -lt 30 -and -not $ok; $i++) {
       Start-Sleep -Seconds 1
       try { $ok = (Invoke-WebRequest -Uri ($url + 'api/health') -UseBasicParsing -TimeoutSec 2).StatusCode -eq 200 } catch { }
     }
-    if ($ok) { & $log "O Central Diogo está no ar em $url" }
-    else { & $log "O Central Diogo foi iniciado, mas ainda não respondeu em $url. Espere um pouco e abra o endereço; se persistir, veja o arquivo hub.log em $D." }
+    if ($ok) { & $log "O DVR está no ar em $url" }
+    else { & $log "O DVR foi iniciado, mas ainda não respondeu em $url. Espere um pouco e abra o endereço; se persistir, veja o arquivo hub.log em $D." }
   }
 
   & $log "Versão instalada: V$nova (era V$velha)"
@@ -206,10 +206,10 @@ function Install-Central([string]$modo, [scriptblock]$log) {
 function Uninstall-Central([bool]$apagar, [scriptblock]$log) {
   $inst = Find-Instalacao
   if (-not $inst -and $Pasta -and (Test-Path (Join-Path $Pasta $Exe))) { $inst = [pscustomobject]@{ Pasta = $Pasta; Modo = 'pessoal'; Raiz = 'HKCU:' } }
-  if (-not $inst) { throw 'Não encontrei uma instalação do Central Diogo neste Windows.' }
+  if (-not $inst) { throw 'Não encontrei uma instalação do DVR neste Windows.' }
   if ($inst.Modo -eq 'servidor' -and -not $SemRegistro -and -not (Test-Admin)) { throw 'Desinstalar o modo servidor precisa de administrador.' }
   $D = $inst.Pasta
-  & $log 'Parando o Central Diogo ...'
+  & $log 'Parando o DVR ...'
   Stop-Hub $D
   if (-not $SemRegistro) {
     Unregister-ScheduledTask -TaskName $Tarefa -Confirm:$false -ErrorAction SilentlyContinue
@@ -238,7 +238,7 @@ function Restart-ComoAdmin([string]$extra) {
     Start-Process powershell.exe -Verb RunAs -ArgumentList $a
     return $true
   } catch {
-    [System.Windows.Forms.MessageBox]::Show('A permissão de administrador não foi concedida. Nada foi alterado.', 'Central Diogo', 'OK', 'Information') | Out-Null
+    [System.Windows.Forms.MessageBox]::Show('A permissão de administrador não foi concedida. Nada foi alterado.', 'DVR', 'OK', 'Information') | Out-Null
     return $false
   }
 }
@@ -255,7 +255,7 @@ if ($Silencioso) {
 # ---------- janela ----------
 $fonte = New-Object Drawing.Font('Segoe UI', 10)
 $form = New-Object Windows.Forms.Form
-$form.Text = 'Central Diogo'
+$form.Text = 'DVR'
 $form.ClientSize = New-Object Drawing.Size(580, 440)
 $form.StartPosition = 'CenterScreen'
 $form.FormBorderStyle = 'FixedDialog'
@@ -272,8 +272,8 @@ function New-Rotulo([string]$texto, [int]$x, [int]$y, [int]$w, [int]$h, [bool]$n
 # Página 1: escolha do modo
 $pg1 = New-Object Windows.Forms.Panel
 $pg1.Size = $form.ClientSize
-$pg1.Controls.Add((New-Rotulo 'Central Diogo' 24 18 530 34 $true))
-$pg1.Controls.Add((New-Rotulo 'Como você vai usar o Central Diogo neste Windows?' 24 60 530 26))
+$pg1.Controls.Add((New-Rotulo 'DVR' 24 18 530 34 $true))
+$pg1.Controls.Add((New-Rotulo 'Como você vai usar o DVR neste Windows?' 24 60 530 26))
 
 $rbServidor = New-Object Windows.Forms.RadioButton
 $rbServidor.Text = 'Servidor da casa'
@@ -326,7 +326,7 @@ $lnkEnd.Location = New-Object Drawing.Point(90, 0); $lnkEnd.Size = New-Object Dr
 $pnlRes.Controls.AddRange(@($lblEnd, $lnkEnd))
 $pg2.Controls.Add($pnlRes)
 $btAbrir = New-Object Windows.Forms.Button
-$btAbrir.Text = 'Abrir o Central Diogo'; $btAbrir.Size = New-Object Drawing.Size(180, 36); $btAbrir.Location = New-Object Drawing.Point(180, 388); $btAbrir.Visible = $false
+$btAbrir.Text = 'Abrir o DVR'; $btAbrir.Size = New-Object Drawing.Size(180, 36); $btAbrir.Location = New-Object Drawing.Point(180, 388); $btAbrir.Visible = $false
 $btFechar = New-Object Windows.Forms.Button
 $btFechar.Text = 'Fechar'; $btFechar.Size = New-Object Drawing.Size(120, 36); $btFechar.Location = New-Object Drawing.Point(430, 388); $btFechar.Enabled = $false
 $pg2.Controls.AddRange(@($btAbrir, $btFechar))
@@ -360,9 +360,9 @@ function Invoke-Instalar([string]$modo) {
 }
 
 function Invoke-Desinstalar {
-  $c = [Windows.Forms.MessageBox]::Show('Remover o Central Diogo deste computador?', 'Central Diogo', 'OKCancel', 'Question')
+  $c = [Windows.Forms.MessageBox]::Show('Remover o DVR deste computador?', 'DVR', 'OKCancel', 'Question')
   if ($c -ne 'OK') { return }
-  $apagar = ([Windows.Forms.MessageBox]::Show("Apagar também os seus dados (banco, configuração, livros)?`r`n`r`nSim: apaga tudo.`r`nNão: remove o programa e mantém os dados.", 'Central Diogo', 'YesNo', 'Warning', 'Button2') -eq 'Yes')
+  $apagar = ([Windows.Forms.MessageBox]::Show("Apagar também os seus dados (banco, configuração, livros)?`r`n`r`nSim: apaga tudo.`r`nNão: remove o programa e mantém os dados.", 'DVR', 'YesNo', 'Warning', 'Button2') -eq 'Yes')
   Show-Andamento 'Desinstalando...'
   try {
     Uninstall-Central $apagar $logJanela

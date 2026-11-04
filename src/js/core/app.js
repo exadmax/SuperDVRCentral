@@ -18,7 +18,7 @@
   // ---------- layout ----------
   function header(s) {
     const w = s.weather;
-    return '<header class="top"><div class="brand"><img class="logo" src="assets/img/logo-128.png" alt="Omega Diogo">' +
+    return '<header class="top"><div class="brand"><img class="logo" src="assets/img/logo-128.png" alt="DVR">' +
       '<div class="clock"><div class="time num">' + U.hhmm(s.now) + '</div><div class="date">' + U.dataExtenso(s.now) + '</div></div></div>' +
       CD.widgets.holidayPill(s) +
       '<div class="wxnow">' + (w ? I.weather(w.now.code, w.now.isDay, '#4DA3FF', 52, 1.8) : '') +

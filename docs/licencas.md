@@ -1,6 +1,6 @@
 # Licenças de terceiros
 
-O SuperDVRCentral (derivado do Central Diogo / DVRCentral) é distribuído sob a **GNU GPL v3** ([LICENSE](../LICENSE)). Este documento lista os
+O SuperDVRCentral (derivado do DVR / DVRCentral) é distribuído sob a **GNU GPL v3** ([LICENSE](../LICENSE)). Este documento lista os
 componentes de terceiros e a licença de cada um. Este texto é um inventário técnico, **não é aconselhamento jurídico**.
 
 Regra do projeto para componentes novos: **GPL ou MIT** (ou equivalente permissivo), sem alterar o código de terceiros além do estritamente necessário e sempre

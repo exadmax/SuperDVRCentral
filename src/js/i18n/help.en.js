@@ -39,7 +39,7 @@
       <p>They show the CPU and memory usage of the hub itself and of the whole machine, refreshed every 5 seconds. If the machine’s memory is almost full, the panel may become slow: use “Free up memory”.</p>
       <h3>Free up memory</h3>
       <ul><li><b>Turn off the desktop</b>: stops the server’s graphical environment (screen, browser, desktop audio). It does not affect the hub, the panel or the cameras. It comes back by itself the next time the machine restarts.</li>
-        <li><b>Shut down the hub</b>: stops the hub. The panel, cameras and calendar go offline until someone runs <code>sudo systemctl start centraldiogo-hub</code> on the server.</li></ul>
+        <li><b>Shut down the hub</b>: stops the hub. The panel, cameras and calendar go offline until someone runs <code>sudo systemctl start dvr-hub</code> on the server.</li></ul>
       <p>Both buttons need <b>two taps</b>: the first arms the button (“Confirm?”, for 5 seconds) and the second runs it. They only work on the Linux server, with the polkit rule installed by <code>install.sh</code>.</p>` },
 
     { id: 'cameras', title: 'Cameras: setup', html: `
@@ -208,7 +208,7 @@
         <li>The default names (Games, Fridge, Cameras…) are translated to the language in use; a name you typed is shown exactly as written.</li></ul>` },
 
     { id: 'integracoes', title: 'Integrations', html: `
-      <p>Options of the hub itself. <b>All of them only take effect after the hub restarts</b>: after saving, the yellow banner appears with the <b>Restart the hub now</b> button (the panel and cameras go offline for a few seconds). If the button does not appear, restart on the server: <code>sudo systemctl restart centraldiogo-hub</code>.</p>
+      <p>Options of the hub itself. <b>All of them only take effect after the hub restarts</b>: after saving, the yellow banner appears with the <b>Restart the hub now</b> button (the panel and cameras go offline for a few seconds). If the button does not appear, restart on the server: <code>sudo systemctl restart dvr-hub</code>.</p>
       <h3>Professionals spreadsheet</h3>
       <p>The Services page (professionals: electrician, plumber…) can be fed from a Google spreadsheet.</p>
       <ol><li>In the spreadsheet, keep a sheet with the headers below and <b>publish it to the web</b> (File &rarr; Share &rarr; Publish to web) or use the format <code>https://docs.google.com/spreadsheets/d/ID/gviz/tq?tqx=out:csv&amp;sheet=SHEET_NAME</code>.</li>
@@ -229,6 +229,16 @@
         <li><b>Calendars: keep for</b>: minutes the hub reuses a calendar before reading Google again (default 5).</li>
         <li><b>Traffic: query at most every</b>: minimum interval between API queries (default 10). Increase it to spend less quota.</li>
         <li><b>Use IPv4 only</b>: needed if the Google key has an IP restriction.</li></ul>` },
+
+    { id: 'ia', title: 'AI (assistant)', html: `
+      <p>Sets up the artificial intelligence used by the PC interface (the Jarvis assistant). Everything runs on the server: nothing from the AI is installed on the TV or the phone.</p>
+      <h3>Server GPU</h3>
+      <p>Shows the graphics card found and how much memory is left for a model. An integrated GPU (Intel Iris Xe, for example) has no memory of its own: it uses the computer's RAM, so only half of the shared memory counts. The <b>suggested models</b> fit in that memory; a bigger model works, but slowly.</p>
+      <h3>Provider</h3>
+      <ul><li><b>Ollama (local)</b>: the default. Install Ollama on the server (<code>winget install Ollama.Ollama</code> on Windows, or ollama.com/download) and download a suggested model with <code>ollama pull &lt;model&gt;</code>. Nothing leaves your home.</li>
+      <li><b>Groq (internet)</b>: faster and with bigger models, but the text goes to Groq. It needs the key (console.groq.com/keys), which stays on the server.</li>
+      <li><b>Off</b>: the PC interface works without the chat.</li></ul>
+      <p><b>Test connection</b> shows the Ollama version and the installed models, marking those that fit the GPU. On Intel or AMD GPUs Ollama uses Vulkan; if the model is slow, check on the server with <code>ollama ps</code> whether it went to the GPU.</p>` },
 
     { id: 'idioma', title: 'Language', html: `
       <p>The interface (home screen, Fridge &amp; Pantry, Services, Cameras, Videos and Config itself, including this Help) is available in <b>four languages</b>: Português, English, Español and 中文 (Simplified Chinese).</p>

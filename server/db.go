@@ -69,7 +69,21 @@ var migrations = []string{
 	DROP TABLE itens;
 	ALTER TABLE itens_novo RENAME TO itens;
 	CREATE INDEX itens_validade ON itens (validade);`,
+	// O Diogows (área de trabalho web do DVRCentral) saiu do projeto: um banco que veio de lá perde as tabelas dele.
+	`DROP TABLE IF EXISTS desk_calendars;
+	DROP TABLE IF EXISTS desk_home;
+	DROP TABLE IF EXISTS desk_mail_accounts;
+	DROP TABLE IF EXISTS desk_mail_apps;
+	DROP TABLE IF EXISTS desk_messages;
+	DROP TABLE IF EXISTS desk_prefs;
+	DROP TABLE IF EXISTS desk_profiles;
+	DROP TABLE IF EXISTS desk_sessions;
+	DROP TABLE IF EXISTS desk_users;`,
 }
+
+// legacyBase: quantas migrações o DVRCentral tem em comum com este projeto. As que vinham depois eram só do Diogows,
+// então um banco de lá (user_version maior que a lista atual, com a tabela desk_users) volta para este ponto e segue daqui.
+const legacyBase = 4
 
 type store struct {
 	db      *sql.DB         // única conexão, para gravar (e para o que precisa ler o que acabou de gravar numa transação)
@@ -118,6 +132,16 @@ func (s *store) migrate() error {
 	var v int
 	if err := s.db.QueryRow("PRAGMA user_version").Scan(&v); err != nil {
 		return err
+	}
+	if v > len(migrations) {
+		var n int
+		if err := s.db.QueryRow("SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = 'desk_users'").Scan(&n); err != nil {
+			return err
+		}
+		if n == 0 {
+			return fmt.Errorf("banco na versão %d, mais nova que este hub (%d): atualize o hub", v, len(migrations))
+		}
+		v = legacyBase // banco do DVRCentral: a migração de limpeza apaga as tabelas do Diogows
 	}
 	for i := v; i < len(migrations); i++ {
 		tx, err := s.db.Begin()
